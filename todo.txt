@@ -1,0 +1,14 @@
+
+Bugs:
+osgi-file-bundle
+- Movies (*.mov) are marked as dam:image
+- File browser needs to have scroll bar at Screen height marker
+- File upload drag/drop needs to support folders
+
+osgi-photo-bundle
+- Photos are grouped by date uploaded,
+
+Todo:
+osgi-file-bundle
+- File Browser Sidebar
+
