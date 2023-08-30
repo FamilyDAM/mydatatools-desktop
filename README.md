@@ -1,8 +1,7 @@
-FamilyD.A.M. | Digital Asset Manager for Families
-==============
+# MyData/Tools 
 
-FamilyDAM started with one idea - there has to be a better option than windows explorer to organize, browse and search all of our family files.
+### Your personal data manager, organizer, and backup tool
 
-Families today are starting to drown in digital files, a simple file browser is not longer an easy to use option when you have tens of thousands of photos. Or thousands of mp3 song files, or years of document archives. 
+MyData/Tools started with one idea - we need a way to backup all of our online data. 
 
-At the same time we are spreading our digital files across the internet. However, just like corporations families need a central source of truth for all of these files. An archive or a backup of everything we share online. 
+We wanted a way to keep a local copy of everything we post online. This includes cloud drives, emails, social media posts. 

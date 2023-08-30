@@ -104,10 +104,12 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
                     ),
 
                     /// List of different collection apps
-                    ListTile(
-                      title: isCollapsed ? const Text('') : const Text('Collections'),
-                      onTap: null,
-                    ),
+                    SizedBox(
+                        height: 38,
+                        child: ListTile(
+                          title: isCollapsed ? const Text('') : const Text('Collections'),
+                          onTap: null,
+                        )),
                     ...collectionApps.map((app) {
                       return ListTile(
                         leading: Icon(
@@ -124,10 +126,12 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
                     }),
 
                     /// Apps build to work with the different locations
-                    ListTile(
-                      title: isCollapsed ? const Text('') : const Text('Applications'),
-                      onTap: null,
-                    ),
+                    SizedBox(
+                        height: 38,
+                        child: ListTile(
+                          title: isCollapsed ? const Text('') : const Text('Applications'),
+                          onTap: null,
+                        )),
                     ...appApps.map((app) {
                       return ListTile(
                         leading: Icon(

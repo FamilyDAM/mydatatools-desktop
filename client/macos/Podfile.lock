@@ -43,7 +43,7 @@ SPEC CHECKSUMS:
   flutter_secure_storage_macos: d56e2d218c1130b262bef8b4a7d64f88d7f9c9ea
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   path_provider_foundation: eaf5b3e458fc0e5fbb9940fb09980e853fe058b8
-  realm: 2eba0dd30f82e91eeaada0314f986edc9fee33de
+  realm: 9df2748a4908dfc1496d747061ca65fbb9102f90
   url_launcher_macos: 5335912b679c073563f29d89d33d10d459f95451
   window_size: 339dafa0b27a95a62a843042038fa6c3c48de195
   window_to_front: 4cdc24ddd8461ad1a55fa06286d6a79d8b29e8d8
