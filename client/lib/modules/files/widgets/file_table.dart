@@ -1,6 +1,7 @@
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:client/models/module_models.dart';
@@ -122,10 +123,8 @@ class _FileTable extends State<FileTable> {
     for (var f in assets) {
       if (f is File) {
         //File Cells
-        bool isImage = f.contentType == FilesConstants.mimeTypeImage;
-        io.File fileRef = io.File(f.path);
-
         var moment = Moment.fromMillisecondsSinceEpoch(f.dateCreated.millisecondsSinceEpoch, isUtc: true);
+        bool isImage = f.contentType == FilesConstants.mimeTypeImage;
 
         rows.add(DataRow(
             selected: selectedRows.contains(f.path),
@@ -136,9 +135,7 @@ class _FileTable extends State<FileTable> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        !isImage
-                            ? Icon(getIconForMimeType(f.contentType))
-                            : Image(image: ResizeImage(FileImage(fileRef), width: 64, height: 64)),
+                        !isImage ? Icon(getIconForMimeType(f.contentType)) : getImageComponent(isImage, f),
                         const SizedBox(width: 8),
                         Text(f.name, overflow: TextOverflow.ellipsis),
                       ],
@@ -228,6 +225,25 @@ class _FileTable extends State<FileTable> {
       }
     }
     return rows;
+  }
+
+  Widget getImageComponent(bool isImage, File file) {
+    if (isImage) {
+      try {
+        if (file.thumbnail != null) {
+          return Padding(
+              padding: const EdgeInsets.all(4),
+              child: Image(image: ResizeImage(MemoryImage(base64Decode(file.thumbnail!)), width: 100, height: 64)));
+        } else {
+          return Padding(
+              padding: const EdgeInsets.all(4),
+              child: Image(image: ResizeImage(FileImage(io.File(file.path)), width: 100, height: 64)));
+        }
+      } catch (err) {
+        //do nothing, return placeholder
+      }
+    }
+    return const Placeholder();
   }
 
   IconData? getIconForMimeType(String contentType) {

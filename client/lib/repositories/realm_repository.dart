@@ -3,14 +3,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as io;
+import 'dart:isolate';
 
 import 'package:client/app_constants.dart';
 import 'package:client/app_logger.dart';
 import 'package:client/models/app_models.dart';
 import 'package:client/models/collection_model.dart';
 import 'package:client/models/module_models.dart';
+import 'package:client/repositories/watchers/collection_watcher_isolate.dart';
 import 'package:client/scanners/scanner_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:realm/realm.dart';
 
 class RealmRepository {
@@ -20,8 +23,10 @@ class RealmRepository {
   static RealmRepository? _instance;
   static RealmRepository get instance => _instance!;
 
-  Realm? _db;
-  Realm get database => _db!;
+  late Configuration config;
+  late Realm _db;
+  // ignore: unnecessary_getters_setters
+  Realm get database => _db;
   set database(Realm realm) {
     _db = realm;
   }
@@ -63,13 +68,15 @@ class RealmRepository {
     try {
       Configuration.defaultRealmName = AppConstants.realmName;
 
-      Configuration config = Configuration.local(
+      config = Configuration.local(
           [Apps.schema, AppUser.schema, Collection.schema, Folder.schema, File.schema, Email.schema],
-          schemaVersion: 1, shouldDeleteIfMigrationNeeded: true, path: storagePath);
+          schemaVersion: AppConstants.schemaVersion,
+          shouldDeleteIfMigrationNeeded: AppConstants.shouldDeleteIfMigrationNeeded,
+          path: storagePath);
 
       //todo: set app specific name
       database = Realm(config);
-      debugPrint("Realm Db = ${database.config.path}");
+      debugPrint("Database Path: = ${database.config.path}");
     } catch (err) {
       logger.e(err);
       rethrow;
@@ -78,10 +85,16 @@ class RealmRepository {
 
   /// Start a realm change stream for each collection type
   void _initializeSyncWatchers() {
-    _watchCollections();
-    _watchFolders();
-    _watchFiles();
-    _watchEmails();
+    ReceivePort myReceivePort = ReceivePort();
+    RootIsolateToken? token = ServicesBinding.rootIsolateToken;
+    CollectionWatcherIsolate collectionWatcherIsolate = CollectionWatcherIsolate(config.path, token);
+    //start isolate version of the collection watcher
+    Isolate.spawn<SendPort>(collectionWatcherIsolate.start, myReceivePort.sendPort);
+
+    //_watchCollections();
+    //_watchFolders();
+    //_watchFiles();
+    //_watchEmails();
   }
 
   /// Start up a scanner for each collection
@@ -118,6 +131,7 @@ class RealmRepository {
     }
   }
 
+  /**
   /// Listen for object changes in 'Collection'
   void _watchCollections() {
     collectionSubs = database.all<Collection>().changes.listen((changes) {
@@ -225,4 +239,5 @@ class RealmRepository {
       }
     });
   }
+  **/
 }

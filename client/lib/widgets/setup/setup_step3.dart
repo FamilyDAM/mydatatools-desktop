@@ -82,6 +82,10 @@ class _SetupStep3State extends State<SetupStep3> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.appUser == null) {
+      return Container();
+    }
+
     var appUserClone = widget.appUser!;
     //handle async setup for validators
     if (appUserClone.publicKey.isEmpty || appUserClone.privateKey.isEmpty) {
@@ -90,7 +94,7 @@ class _SetupStep3State extends State<SetupStep3> {
       encryptionForm.updateValue({'publicKey': appUserClone.publicKey, 'privateKey': appUserClone.privateKey});
     }
 
-    if (appUserClone.publicKey.isEmpty) {
+    if (widget.appUser!.publicKey.isEmpty) {
       return Container();
     }
 

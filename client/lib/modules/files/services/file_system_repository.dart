@@ -128,6 +128,11 @@ class FileSystemRepository {
   /// File Specific Methods
   ///
 
+  File? getFileById(int id) {
+    //todo: add collectionId to filter
+    return database.query<File>("id = '$id'").firstOrNull;
+  }
+
   List<File> files(String collectionId, String parentPath) {
     //todo: add collectionId to filter
     return database.query<File>("collectionId = '$collectionId' AND parent == '$parentPath' SORT(path asc)").toList();
@@ -192,6 +197,50 @@ class FileSystemRepository {
     }
     return Future(() {
       return newFiles.length;
+    });
+  }
+
+  void updateProperty(File file, String prop, dynamic value) {
+    database.writeAsync(() {
+      switch (prop) {
+        case "thumbnail":
+          file.thumbnail = value;
+          break;
+        case "latitude":
+          file.latitude = value;
+          break;
+        case "longitude":
+          file.longitude = value;
+          break;
+      }
+    }).then((value) {
+      //print("saved file: $value");
+    }).catchError((error) {
+      logger.e(error);
+      logger.s(error);
+    });
+  }
+
+  void updatePropertyMap(File file, Map<String, dynamic> props) {
+    database.writeAsync(() {
+      for (var key in props.keys) {
+        switch (key) {
+          case "thumbnail":
+            file.thumbnail = props[key];
+            break;
+          case "latitude":
+            file.latitude = props[key];
+            break;
+          case "longitude":
+            file.longitude = props[key];
+            break;
+        }
+      }
+    }).then((value) {
+      //print("saved file: $value");
+    }).catchError((error) {
+      logger.e(error);
+      logger.s(error);
     });
   }
 

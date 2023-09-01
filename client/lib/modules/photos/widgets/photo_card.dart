@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:client/models/module_models.dart';
@@ -17,7 +18,6 @@ class PhotoCard extends StatefulWidget {
 class _PhotoCardState extends State<PhotoCard> {
   @override
   Widget build(BuildContext context) {
-    io.File fileRef = io.File(widget.file.path);
     return Column(
       children: [
         SizedBox(
@@ -27,9 +27,9 @@ class _PhotoCardState extends State<PhotoCard> {
               ProgressiveImage(
                 placeholder: const AssetImage('assets/placeholder.jpg'),
                 // size: 1.87KB
-                thumbnail: FileImage(fileRef),
+                thumbnail: getImageComponent(widget.file),
                 // size: 1.29MB
-                image: FileImage(fileRef),
+                image: getImageComponent(widget.file),
                 fit: BoxFit.fitHeight,
                 repeat: ImageRepeat.noRepeat,
                 height: widget.width,
@@ -44,12 +44,25 @@ class _PhotoCardState extends State<PhotoCard> {
                     child: Center(
                       child: Text(
                         widget.file.name,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
                       ),
                     ),
                   ))
             ])),
       ],
     );
+  }
+
+  ImageProvider<Object> getImageComponent(File file) {
+    try {
+      if (file.thumbnail != null) {
+        return MemoryImage(base64Decode(file.thumbnail!));
+      } else {
+        return FileImage(io.File(file.path));
+      }
+    } catch (err) {
+      //do nothing, return placeholder
+    }
+    return const AssetImage('assets/placeholder.jpg');
   }
 }

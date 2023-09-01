@@ -45,6 +45,9 @@ class _File implements FileAsset {
   @PrimaryKey()
   late String id;
   @override
+  @Indexed()
+  late String collectionId;
+  @override
   late String name;
   @override
   @Indexed()
@@ -56,13 +59,14 @@ class _File implements FileAsset {
   late DateTime dateCreated;
   @override
   late DateTime lastModified;
-  @override
-  @Indexed()
-  late String collectionId;
 
   late int size; //in KB
+  late List<int> embeddings = [];
   late String contentType; //mime/type
+  late String? thumbnail;
   late bool isDeleted = false;
+  late double? latitude;
+  late double? longitude;
 }
 
 @RealmModel()

@@ -231,8 +231,8 @@ class LocalFileScanner implements CollectionScanner {
         String name = d.path.split("/").last;
         String parentPath = d.path.split("/").sublist(0, d.path.split("/").length - 1).join("/");
         DateTime lmDate = d.lastModifiedSync();
-        newFiles.add(models.File('$collectionId:${d.path.hashCode}', name, d.path, parentPath, lmDate, lmDate,
-            collectionId, d.lengthSync(), getMimeType(name)));
+        newFiles.add(models.File('$collectionId:${d.path.hashCode}', collectionId, name, d.path, parentPath, lmDate,
+            lmDate, d.lengthSync(), getMimeType(name)));
       }
     }
 

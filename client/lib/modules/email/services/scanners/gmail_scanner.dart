@@ -194,8 +194,11 @@ class GmailScanner implements CollectionScanner {
           orElse: () => MessagePartHeader(name: "Subject", value: null));
       MessagePartHeader? from = m.payload?.headers?.singleWhere((element) => element.name?.toLowerCase() == "from",
           orElse: () => MessagePartHeader(name: "From", value: null));
-      MessagePartHeader? to = m.payload?.headers?.singleWhere((element) => element.name?.toLowerCase() == "to",
+
+      //todo, support array of TO headers
+      MessagePartHeader? to = m.payload?.headers?.firstWhere((element) => element.name?.toLowerCase() == "to",
           orElse: () => MessagePartHeader(name: "To", value: null));
+
       MessagePartHeader? cc = m.payload?.headers?.singleWhere((element) => element.name?.toLowerCase() == "cc",
           orElse: () => MessagePartHeader(name: "CC", value: null));
       //MessagePartHeader? msgDate = m.payload?.headers?.singleWhere((element) => element.name?.toLowerCase() == "date",
@@ -360,8 +363,8 @@ Future<List<File>> parseAttachmentParts(String accessToken, Collection collectio
         file.writeAsBytesSync(base64.decode(apiMsg.data!));
 
         logger.v('Download Attachment: $fileName | dir:$dir | messageId: $messageId');
-        File f = File(Uuid.v4().toString(), fileName, file.path, dir.path, DateTime.now(), DateTime.now(),
-            collection.id, 0, contentType);
+        File f = File(Uuid.v4().toString(), collection.id, fileName, file.path, dir.path, DateTime.now(),
+            DateTime.now(), 0, contentType);
         files.add(f);
       } catch (e) {
         logger.w('Cannot parse attachment: $e | messageId: $messageId | part: $part');

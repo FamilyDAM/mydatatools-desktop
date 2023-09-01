@@ -81,6 +81,9 @@ dependencies:
   json_annotation: ^4.8.1
   flutter_form_builder: ^9.1.0
   form_builder_validators: ^9.0.0
+  image: ^4.0.17
+  native_exif: ^0.5.0
+  exif: ^3.1.4
 
 
 dev_dependencies:

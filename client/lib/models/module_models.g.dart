@@ -116,15 +116,19 @@ class File extends _File with RealmEntity, RealmObjectBase, RealmObject {
 
   File(
     String id,
+    String collectionId,
     String name,
     String path,
     String parent,
     DateTime dateCreated,
     DateTime lastModified,
-    String collectionId,
     int size,
     String contentType, {
+    String? thumbnail,
     bool isDeleted = false,
+    double? latitude,
+    double? longitude,
+    Iterable<int> embeddings = const [],
   }) {
     if (!_defaultsSet) {
       _defaultsSet = RealmObjectBase.setDefaults<File>({
@@ -132,15 +136,20 @@ class File extends _File with RealmEntity, RealmObjectBase, RealmObject {
       });
     }
     RealmObjectBase.set(this, 'id', id);
+    RealmObjectBase.set(this, 'collectionId', collectionId);
     RealmObjectBase.set(this, 'name', name);
     RealmObjectBase.set(this, 'path', path);
     RealmObjectBase.set(this, 'parent', parent);
     RealmObjectBase.set(this, 'dateCreated', dateCreated);
     RealmObjectBase.set(this, 'lastModified', lastModified);
-    RealmObjectBase.set(this, 'collectionId', collectionId);
     RealmObjectBase.set(this, 'size', size);
     RealmObjectBase.set(this, 'contentType', contentType);
+    RealmObjectBase.set(this, 'thumbnail', thumbnail);
     RealmObjectBase.set(this, 'isDeleted', isDeleted);
+    RealmObjectBase.set(this, 'latitude', latitude);
+    RealmObjectBase.set(this, 'longitude', longitude);
+    RealmObjectBase.set<RealmList<int>>(
+        this, 'embeddings', RealmList<int>(embeddings));
   }
 
   File._();
@@ -149,6 +158,13 @@ class File extends _File with RealmEntity, RealmObjectBase, RealmObject {
   String get id => RealmObjectBase.get<String>(this, 'id') as String;
   @override
   set id(String value) => RealmObjectBase.set(this, 'id', value);
+
+  @override
+  String get collectionId =>
+      RealmObjectBase.get<String>(this, 'collectionId') as String;
+  @override
+  set collectionId(String value) =>
+      RealmObjectBase.set(this, 'collectionId', value);
 
   @override
   String get name => RealmObjectBase.get<String>(this, 'name') as String;
@@ -180,16 +196,16 @@ class File extends _File with RealmEntity, RealmObjectBase, RealmObject {
       RealmObjectBase.set(this, 'lastModified', value);
 
   @override
-  String get collectionId =>
-      RealmObjectBase.get<String>(this, 'collectionId') as String;
-  @override
-  set collectionId(String value) =>
-      RealmObjectBase.set(this, 'collectionId', value);
-
-  @override
   int get size => RealmObjectBase.get<int>(this, 'size') as int;
   @override
   set size(int value) => RealmObjectBase.set(this, 'size', value);
+
+  @override
+  RealmList<int> get embeddings =>
+      RealmObjectBase.get<int>(this, 'embeddings') as RealmList<int>;
+  @override
+  set embeddings(covariant RealmList<int> value) =>
+      throw RealmUnsupportedSetError();
 
   @override
   String get contentType =>
@@ -199,9 +215,27 @@ class File extends _File with RealmEntity, RealmObjectBase, RealmObject {
       RealmObjectBase.set(this, 'contentType', value);
 
   @override
+  String? get thumbnail =>
+      RealmObjectBase.get<String>(this, 'thumbnail') as String?;
+  @override
+  set thumbnail(String? value) => RealmObjectBase.set(this, 'thumbnail', value);
+
+  @override
   bool get isDeleted => RealmObjectBase.get<bool>(this, 'isDeleted') as bool;
   @override
   set isDeleted(bool value) => RealmObjectBase.set(this, 'isDeleted', value);
+
+  @override
+  double? get latitude =>
+      RealmObjectBase.get<double>(this, 'latitude') as double?;
+  @override
+  set latitude(double? value) => RealmObjectBase.set(this, 'latitude', value);
+
+  @override
+  double? get longitude =>
+      RealmObjectBase.get<double>(this, 'longitude') as double?;
+  @override
+  set longitude(double? value) => RealmObjectBase.set(this, 'longitude', value);
 
   @override
   Stream<RealmObjectChanges<File>> get changes =>
@@ -216,6 +250,8 @@ class File extends _File with RealmEntity, RealmObjectBase, RealmObject {
     RealmObjectBase.registerFactory(File._);
     return const SchemaObject(ObjectType.realmObject, File, 'File', [
       SchemaProperty('id', RealmPropertyType.string, primaryKey: true),
+      SchemaProperty('collectionId', RealmPropertyType.string,
+          indexType: RealmIndexType.regular),
       SchemaProperty('name', RealmPropertyType.string),
       SchemaProperty('path', RealmPropertyType.string,
           indexType: RealmIndexType.regular),
@@ -223,11 +259,14 @@ class File extends _File with RealmEntity, RealmObjectBase, RealmObject {
           indexType: RealmIndexType.regular),
       SchemaProperty('dateCreated', RealmPropertyType.timestamp),
       SchemaProperty('lastModified', RealmPropertyType.timestamp),
-      SchemaProperty('collectionId', RealmPropertyType.string,
-          indexType: RealmIndexType.regular),
       SchemaProperty('size', RealmPropertyType.int),
+      SchemaProperty('embeddings', RealmPropertyType.int,
+          collectionType: RealmCollectionType.list),
       SchemaProperty('contentType', RealmPropertyType.string),
+      SchemaProperty('thumbnail', RealmPropertyType.string, optional: true),
       SchemaProperty('isDeleted', RealmPropertyType.bool),
+      SchemaProperty('latitude', RealmPropertyType.double, optional: true),
+      SchemaProperty('longitude', RealmPropertyType.double, optional: true),
     ]);
   }
 }
