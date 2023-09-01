@@ -6,6 +6,7 @@ import 'package:image/image.dart' as img;
 
 class ThumbnailGenerator {
   Future<String?> imageToBase64(File file) async {
+    bool thumbGenerated = false;
     if (file.contentType == FilesConstants.mimeTypeImage) {
       var localFile = io.File(file.path);
       if (localFile.existsSync()) {
@@ -17,11 +18,10 @@ class ThumbnailGenerator {
           if (image.height >= image.width && image.height > 240) {
             thumb = img.copyResize(image, height: 240);
           } else if (image.width >= image.height && image.width > 320) {
-            {
-              thumb = img.copyResize(image, width: 320);
-            }
+            thumb = img.copyResize(image, width: 320);
 
             //save as jpeg and encode to base64
+            thumbGenerated = true;
             final jpg = img.encodeJpg(thumb);
             var enc = base64Encode(jpg);
             return Future(() => enc);
@@ -29,6 +29,11 @@ class ThumbnailGenerator {
         }
       }
     }
+
+    if (!thumbGenerated) {
+      //todo, check EXIF data and see if thumbnail exists in exif (TIF, JPG often have this)
+    }
+
     return Future(() => null);
   }
 }

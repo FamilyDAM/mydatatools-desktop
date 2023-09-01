@@ -168,7 +168,7 @@ class LocalFileScanner implements CollectionScanner {
   /// Validate directories against the know paths we want to skip.
   /// Convert dart.io to a local model object
   Future<List<models.Folder>> _validateFolders(
-      Map<String, DateTime> existingFiles, String collectionId, List<Directory> dirs) {
+      Map<String, DateTime> existingFolders, String collectionId, List<Directory> dirs) {
     final hiddenFolderRegex = RegExp('/[.].*/?', multiLine: false, caseSensitive: true, unicode: true);
 
     //todo: add this list to a global config / UI page
@@ -189,7 +189,7 @@ class LocalFileScanner implements CollectionScanner {
 
     List<models.Folder> newFolders = [];
     for (var d in cleanList) {
-      if (existingFiles[d.path] == null) {
+      if (existingFolders["$collectionId:${d.path}"] == null) {
         String name = d.path.split("/").last;
         String parentPath = d.path.split("/").sublist(0, d.path.split("/").length - 1).join("/");
 
@@ -227,7 +227,7 @@ class LocalFileScanner implements CollectionScanner {
 
     List<models.File> newFiles = [];
     for (var d in cleanList) {
-      if (existingFiles[d.path] == null) {
+      if (existingFiles["$collectionId:${d.path}"] == null) {
         String name = d.path.split("/").last;
         String parentPath = d.path.split("/").sublist(0, d.path.split("/").length - 1).join("/");
         DateTime lmDate = d.lastModifiedSync();

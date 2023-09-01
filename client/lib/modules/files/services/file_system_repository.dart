@@ -27,19 +27,19 @@ class FileSystemRepository {
     //if id is defined (by file scanner) preload a list of all files in collection
     if (collectionId != null && parent == null) {
       _instance.filesByCollection(collectionId).forEach((element) {
-        _instance.existingFiles.putIfAbsent(element.path, () => element.lastModified);
+        _instance.existingFiles.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
       });
 
       _instance.foldersByCollection(collectionId).forEach((element) {
-        _instance.existingFolders.putIfAbsent(element.path, () => element.lastModified);
+        _instance.existingFolders.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
       });
     } else if (collectionId != null && parent != null) {
       _instance.files(collectionId, parent).forEach((element) {
-        _instance.existingFiles.putIfAbsent(element.path, () => element.lastModified);
+        _instance.existingFiles.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
       });
 
       _instance.folders(collectionId, parent).forEach((element) {
-        _instance.existingFolders.putIfAbsent(element.path, () => element.lastModified);
+        _instance.existingFolders.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
       });
     }
 
