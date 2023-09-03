@@ -19,7 +19,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormBuilderState>();
-  AppLogger logger = AppLogger();
+  AppLogger logger = AppLogger(null);
   String savedPassword = '';
   //get access to local Secure Storage to save data
   FlutterSecureStorage? secureStorage;

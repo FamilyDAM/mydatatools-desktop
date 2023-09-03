@@ -1,3 +1,4 @@
+import 'package:client/models/collection_model.dart';
 import 'package:client/scanners/collection_scanner.dart';
 
 //todo
@@ -9,12 +10,10 @@ class GoogleFileScanner implements CollectionScanner {
   GoogleFileScanner(this.path, this.collectionId, this.repeatFrequency);
 
   @override
-  Future<int> scanDirectory(String path) async {
-    return Future(() => 0);
+  Future<int> start(Collection collection, String? path, bool recursive, bool force) async {
+    return Future(() => -1);
   }
 
-  @override
-  void start(bool recursive, bool force) async {}
   @override
   void stop() async {}
 }

@@ -6,7 +6,7 @@ import 'package:client/repositories/realm_repository.dart';
 import 'package:client/services/rx_service.dart';
 
 class EmailService extends RxService<EmailServiceCommand, List<Email>> {
-  final AppLogger logger = AppLogger();
+  final AppLogger logger = AppLogger(null);
 
   static final EmailService _instance = EmailService();
   static get instance => _instance;

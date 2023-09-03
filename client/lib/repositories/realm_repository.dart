@@ -17,7 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:realm/realm.dart';
 
 class RealmRepository {
-  final AppLogger logger = AppLogger();
+  final AppLogger logger = AppLogger(null);
 
   static bool isInitialized = false;
   static RealmRepository? _instance;

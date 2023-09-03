@@ -9,7 +9,10 @@ class StatusMessage extends StatelessWidget {
     return StreamBuilder<String>(
         stream: AppLogger.statusSubject,
         builder: (BuildContext context, AsyncSnapshot<String> msg) {
-          return Text(msg.data ?? '', style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 12));
+          print('[StatusMessage] ${msg.data}');
+          return Text(msg.data ?? '',
+              key: UniqueKey(),
+              style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 12, overflow: TextOverflow.ellipsis));
         });
   }
 }

@@ -1,8 +1,8 @@
-class CollectionScanner {
-  void start(bool recursive, bool force) async {}
+import 'package:client/models/collection_model.dart';
 
-  Future<int> scanDirectory(String path) async {
-    return Future(() => 0);
+class CollectionScanner {
+  Future<int> start(Collection collection, String? path, bool recursive, bool force) async {
+    return Future(() => -1);
   }
 
   void stop() async {}

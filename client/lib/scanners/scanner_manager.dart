@@ -77,14 +77,14 @@ class ScannerManager {
     switch (c.scanner) {
       case "file.local":
         print("Start '${c.scanner}' scanner for ${c.name} | ${c.path}");
-        CollectionScanner s = LocalFileScanner(database, c, Duration.secondsPerDay);
-        s.start(true, false);
+        CollectionScanner s = LocalFileScanner(database.config.path);
+        s.start(c, c.path, true, false);
         scanners.putIfAbsent(c.id, () => s);
         break;
       case "email.gmail":
         print("Start '${c.scanner}' scanner for ${c.name} | ${c.path}");
         CollectionScanner s = GmailScanner(database, c, fileDir.path, Duration.secondsPerDay);
-        s.start(true, false);
+        s.start(c, c.path, true, false);
         scanners.putIfAbsent(c.id, () => s);
         break;
       default:

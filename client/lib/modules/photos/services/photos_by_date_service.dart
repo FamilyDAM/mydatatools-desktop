@@ -5,7 +5,7 @@ import 'package:client/repositories/realm_repository.dart';
 import 'package:client/services/rx_service.dart';
 
 class PhotosByDateService extends RxService<PhotosByDateServiceCommand, Map<String, List<File>>> {
-  final AppLogger logger = AppLogger();
+  final AppLogger logger = AppLogger(null);
 
   static final PhotosByDateService _instance = PhotosByDateService();
   static get instance => _instance;

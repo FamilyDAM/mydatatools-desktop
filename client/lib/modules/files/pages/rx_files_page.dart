@@ -30,7 +30,7 @@ class RxFilesPage extends StatefulWidget {
 }
 
 class _RxFilesPage extends State<RxFilesPage> {
-  AppLogger logger = AppLogger();
+  AppLogger logger = AppLogger(null);
   GetFileAndFoldersService? _filesAndFoldersService;
   GetCollectionsService? _collectionService;
   StreamSubscription<List<FileAsset>>? _fileServiceSub;
@@ -139,7 +139,7 @@ class _RxFilesPage extends State<RxFilesPage> {
                 //refresh path
                 if (collection != null) {
                   logger.s("refresh file list");
-                  ScannerManager.getInstance().getScanner(collection!)?.start(true, true);
+                  ScannerManager.getInstance().getScanner(collection!)?.start(collection!, null, true, true);
                 }
               },
             ),

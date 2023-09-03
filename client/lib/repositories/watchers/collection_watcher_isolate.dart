@@ -41,14 +41,14 @@ class CollectionWatcherIsolate {
     Realm database = Realm(config);
     print("Realm Db initialized in watcher isolate = ${database.config.path}");
 
-    fileSystemRepository = FileSystemRepository(database, null, null);
+    fileSystemRepository = FileSystemRepository(database);
     collectionRepository = CollectionRepository(database);
     emailRepository = EmailRepository(database);
 
     _initializeSyncWatchers(database);
   }
 
-  final AppLogger logger = AppLogger();
+  final AppLogger logger = AppLogger(null);
 
   //class reference to keep change listeners running
   StreamSubscription<RealmResultsChanges>? collectionSubs;
@@ -144,7 +144,7 @@ class CollectionWatcherIsolate {
 
           //var obj = database.all<File>().elementAt(e);
           //logger.d('[File] inserted | ${obj.path}');
-          logger.d('[File] inserted | ${file.path}');
+          //logger.d('[File] inserted | ${file.path}');
           //todo sync record
         }
       }
@@ -152,7 +152,7 @@ class CollectionWatcherIsolate {
         for (var e in changes.modified) {
           //var obj = database.all<File>().elementAt(e);
           //logger.d('[File] modified | ${obj.path}');
-          logger.d('[File] modified | $e');
+          //logger.d('[File] modified | $e');
           //todo sync record
         }
       }

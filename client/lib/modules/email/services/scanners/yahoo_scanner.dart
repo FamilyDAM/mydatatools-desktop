@@ -13,7 +13,7 @@ class YahooScanner implements CollectionScanner {
   late String appDir;
   bool isStopped = false;
 
-  final AppLogger logger = AppLogger();
+  final AppLogger logger = AppLogger(null);
 
   YahooScanner(this.realm, this.collection, this.appDir, this.repeatFrequency) {
     accessToken = collection.accessToken ?? '';
@@ -21,21 +21,9 @@ class YahooScanner implements CollectionScanner {
   }
 
   @override
-  void stop() async {
-    isStopped = true;
-  }
-
-  @override
-  Future<int> scanDirectory(String path) async {
-    //do nothing
-    print('scan gmail');
-    return Future(() => 0);
-  }
-
-  @override
-  void start(bool recursive, bool force) async {
+  Future<int> start(Collection collection, String? path, bool recursive, bool force) async {
     //skip on restart
-    if (!force && collection.lastScanDate != null) return;
+    if (!force && collection.lastScanDate != null) return Future(() => 0);
 
     EmailRepository emailRepository = EmailRepository(realm);
 
@@ -45,5 +33,12 @@ class YahooScanner implements CollectionScanner {
       minQuery = "before:${minDate.millisecondsSinceEpoch}";
     }
     print(minQuery);
+
+    return Future(() => -1);
+  }
+
+  @override
+  void stop() async {
+    isStopped = true;
   }
 }

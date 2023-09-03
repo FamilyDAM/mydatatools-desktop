@@ -22,7 +22,7 @@ class EmailPage extends StatefulWidget {
 }
 
 class _EmailPage extends State<EmailPage> {
-  AppLogger logger = AppLogger();
+  AppLogger logger = AppLogger(null);
 
   EmailService? _emailService;
   GetCollectionsService? _collectionService;
@@ -114,7 +114,7 @@ class _EmailPage extends State<EmailPage> {
               tooltip: 'Refresh',
               onPressed: () {
                 logger.s("refresh emails");
-                ScannerManager.getInstance().getScanner(collection!)?.start(true, true);
+                ScannerManager.getInstance().getScanner(collection!)?.start(collection!, null, true, true);
               },
             ),
             IconButton(

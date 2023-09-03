@@ -7,7 +7,7 @@ import 'package:client/services/rx_service.dart';
 import 'package:client/repositories/realm_repository.dart';
 
 class GetFileAndFoldersService extends RxService<GetFileServiceCommand, List<FileAsset>> {
-  final AppLogger logger = AppLogger();
+  final AppLogger logger = AppLogger(null);
 
   static final GetFileAndFoldersService _instance = GetFileAndFoldersService();
   static get instance => _instance;
@@ -15,11 +15,10 @@ class GetFileAndFoldersService extends RxService<GetFileServiceCommand, List<Fil
   @override
   Future<List<FileAsset>> invoke(GetFileServiceCommand command) async {
     isLoading.add(true);
-    FileSystemRepository repo =
-        FileSystemRepository(RealmRepository.instance.database, command.collection.id, command.path);
+    FileSystemRepository repo = FileSystemRepository(RealmRepository.instance.database);
 
     //first refresh folders
-    LocalFileScanner(repo.database, command.collection, 0).scanDirectory(command.path).then((value) {
+    LocalFileScanner(repo.database.config.path).start(command.collection, command.path, false, true).then((value) {
       if (value > 0) {
         logger.s("reloading with $value saved files");
         List<FileAsset> filesAndFoldersList = _refreshFiles(repo, command.collection.id, command.path);

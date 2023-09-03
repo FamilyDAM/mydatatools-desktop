@@ -24,7 +24,7 @@ class GmailScanner implements CollectionScanner {
   late String appDir;
   bool isStopped = false;
 
-  final AppLogger logger = AppLogger();
+  final AppLogger logger = AppLogger(null);
 
   GmailScanner(this.realm, this.collection, this.appDir, this.repeatFrequency) {
     accessToken = collection.accessToken ?? '';
@@ -37,16 +37,9 @@ class GmailScanner implements CollectionScanner {
   }
 
   @override
-  Future<int> scanDirectory(String path) async {
-    //do nothing
-    print('scan gmail');
-    return Future(() => 0);
-  }
-
-  @override
-  void start(bool recursive, bool force) async {
+  Future<int> start(Collection collection, String? path, bool recursive, bool force) async {
     //skip on restart
-    if (!force && collection.lastScanDate != null) return;
+    if (!force && collection.lastScanDate != null) return Future(() => 0);
 
     EmailRepository emailRepository = EmailRepository(realm);
 
@@ -140,6 +133,8 @@ class GmailScanner implements CollectionScanner {
         logger.s("");
       });
     }
+
+    return Future(() => -1);
   }
 
   ///Call Google API and load all of the emails

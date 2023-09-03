@@ -9,8 +9,7 @@ import 'package:realm/realm.dart';
 class FileSystemRepository {
   static final FileSystemRepository _instance = FileSystemRepository._internal();
   late Realm database;
-  late String? collectionId;
-  AppLogger logger = AppLogger();
+  AppLogger logger = AppLogger(null);
 
   //list of file paths and their size, so we can compare when looking for new or changed files.
   Map<String, DateTime> existingFiles = <String, DateTime>{};
@@ -20,30 +19,8 @@ class FileSystemRepository {
     return _instance;
   }
 
-  factory FileSystemRepository(Realm db, String? collectionId, String? parent) {
+  factory FileSystemRepository(Realm db) {
     _instance.database = db;
-    _instance.collectionId = collectionId;
-
-    //if id is defined (by file scanner) preload a list of all files in collection
-    if (collectionId != null && parent == null) {
-      _instance.filesByCollection(collectionId).forEach((element) {
-        _instance.existingFiles.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
-      });
-
-      _instance.foldersByCollection(collectionId).forEach((element) {
-        _instance.existingFolders.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
-      });
-    } else if (collectionId != null && parent != null) {
-      _instance.files(collectionId, parent).forEach((element) {
-        _instance.existingFiles.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
-      });
-
-      _instance.folders(collectionId, parent).forEach((element) {
-        _instance.existingFolders.putIfAbsent("$collectionId:${element.path}", () => element.lastModified);
-      });
-    }
-
-    print("Existing Files Size: ${_instance.existingFiles.length}");
     return _instance;
   }
 
@@ -57,6 +34,11 @@ class FileSystemRepository {
 
   List<Folder> folders(String collectionId, String parentPath) {
     return database.query<Folder>("collectionId = '$collectionId' AND parent == '$parentPath' SORT(name asc)").toList();
+  }
+
+  List<Folder> foldersByCollection(String collectionId) {
+    //todo: add collectionId to filter
+    return database.query<Folder>("collectionId = '$collectionId' SORT(path asc)").toList();
   }
 
   void addFolder(Folder folder) {
@@ -78,17 +60,15 @@ class FileSystemRepository {
     }
 
     if (newFolders.isNotEmpty) {
-      database.writeAsync(() {
-        database.addAll<Folder>(newFolders, update: true);
-        //print('save ${newFolders.length} files');
-      }).then((value) {
-        for (var f in newFolders) {
-          print("save dir: ${f.path}");
-        }
-      }).catchError((error) {
+      try {
+        database.write(() {
+          database.addAll<Folder>(newFolders, update: true);
+          //print('save ${newFolders.length} files');
+        });
+      } catch (error) {
         logger.e(error);
         logger.s(error);
-      });
+      }
     }
     return Future(() {
       return newFolders.length;
@@ -143,17 +123,6 @@ class FileSystemRepository {
     return database.query<File>("collectionId = '$collectionId' SORT(path asc)").toList();
   }
 
-  List<Folder> foldersByCollection(String collectionId) {
-    //todo: add collectionId to filter
-    return database.query<Folder>("collectionId = '$collectionId' SORT(path asc)").toList();
-  }
-
-  File? fileByPath(String collectionId, String path) {
-    //todo: add collectionId to filter
-    List<File> files = database.all<File>().where((element) => element.path == path).toList();
-    return files.isNotEmpty ? files.last : null;
-  }
-
   Future<io.File> downloadFile(File f) async {
     io.Directory? downloadFolder = await getDownloadsDirectory();
 
@@ -169,34 +138,19 @@ class FileSystemRepository {
   }
 
   Future<int> addFiles(List<File> files) async {
-    List<File> newFiles = [];
-    for (var f in files) {
-      if (!existingFiles.containsKey(f.path)) {
-        newFiles.add(f);
-        existingFiles.remove(f.path);
-      } else if (existingFiles[f.path]?.compareTo(f.lastModified) != 0) {
-        newFiles.add(f);
-        existingFiles.remove(f.path);
-      } else {
-        existingFiles.remove(f.path);
-      }
-    }
-
-    if (newFiles.isNotEmpty) {
-      database.writeAsync(() {
-        database.addAll<File>(newFiles, update: true);
-        print('saved ${newFiles.length} files');
-      }).then((value) {
-        for (var f in newFiles) {
-          print("saved file: ${f.path}");
-        }
-      }).catchError((error) {
+    if (files.isNotEmpty) {
+      try {
+        database.write(() {
+          database.addAll<File>(files, update: true);
+          //print('saved ${files.length} files');
+        });
+      } catch (error) {
         logger.e(error);
         logger.s(error);
-      });
+      }
     }
     return Future(() {
-      return newFiles.length;
+      return files.length;
     });
   }
 
