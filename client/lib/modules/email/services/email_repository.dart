@@ -44,10 +44,10 @@ class EmailRepository {
       e.collectionId = collectionId;
     }
 
-    database.writeAsync(() => {database.addAll<Email>(emails, update: true)});
+    database.write(() => {database.addAll<Email>(emails, update: true)});
   }
 
   void deleteEmails(String collectionId, List<Email> emails) {
-    database.writeAsync(() => {database.deleteMany<Email>(emails)});
+    database.write(() => {database.deleteMany<Email>(emails)});
   }
 }

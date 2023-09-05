@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:client/oauth/desktop_login_manager.dart';
-import 'package:client/oauth/login_provider.dart';
+import 'package:client/oauth/login_providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:oauth2/oauth2.dart' as oauth2;
 
@@ -9,7 +9,7 @@ import 'package:oauth2/oauth2.dart' as oauth2;
 /// Based on this stackoverflow answer
 /// https://stackoverflow.com/questions/68716993/google-microsoft-oauth2-login-flow-flutter-desktop-macos-windows-linux
 class DesktopOAuthManager extends DesktopLoginManager {
-  final LoginProvider loginProvider;
+  final LoginProviders loginProvider;
 
   DesktopOAuthManager({required this.loginProvider}) : super();
 
@@ -30,13 +30,11 @@ class DesktopOAuthManager extends DesktopLoginManager {
       httpClient: _JsonAcceptingHttpClient(),
       secret: loginProvider.clientSecret,
     );
-    var authorizationUrl =
-        grant.getAuthorizationUrl(redirectUrl, scopes: loginProvider.scopes);
+    var authorizationUrl = grant.getAuthorizationUrl(redirectUrl, scopes: loginProvider.scopes);
 
     await redirect(authorizationUrl);
     var responseQueryParameters = await listen();
-    var client =
-        await grant.handleAuthorizationResponse(responseQueryParameters);
+    var client = await grant.handleAuthorizationResponse(responseQueryParameters);
     return client;
   }
 }

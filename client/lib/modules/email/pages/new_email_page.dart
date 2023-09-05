@@ -11,7 +11,7 @@ import 'package:client/app_constants.dart';
 import 'package:client/models/collection_model.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/oauth/desktop_oauth_manager.dart';
-import 'package:client/oauth/login_provider.dart';
+import 'package:client/oauth/login_providers.dart';
 import 'package:client/repositories/collection_repository.dart';
 import 'package:client/repositories/realm_repository.dart';
 import 'package:client/services/get_collections_service.dart';
@@ -224,7 +224,7 @@ class _NewEmailPage extends State<NewEmailPage> {
     //todo: Security Assessment will be required
     //@see https://support.google.com/cloud/answer/9110914#zippy=%2Cgmail-api%2Cexceptions-to-verification-requirements%2Csteps-to-prepare-for-verification%2Csteps-for-apps-requesting-sensitive-scopes%2Csteps-for-apps-requesting-restricted-scopes%2Csteps-to-submit-your-app%2Csecurity-assessment
     if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-      final provider = DesktopOAuthManager(loginProvider: LoginProvider.google);
+      final provider = DesktopOAuthManager(loginProvider: LoginProviders.google);
 
       var client = await provider.login();
       //print('token=${client.credentials.accessToken}');

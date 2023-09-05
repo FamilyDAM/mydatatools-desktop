@@ -18,7 +18,7 @@ class LocalFileIsolate {
   String dbPath;
   RootIsolateToken? token;
   SendPort sendPort;
-  List<Isolate> isolates = [];
+  Isolate? isolate;
   AppLogger logger = AppLogger(null);
 
   LocalFileIsolate(this.dbPath, this.sendPort) : super() {
@@ -37,9 +37,9 @@ class LocalFileIsolate {
       'recursive': recursive,
       'collectionId': collection.id
     };
-    var iso = await Isolate.spawn<Map<String, dynamic>>(_scan, args);
-    iso.addOnExitListener(p.sendPort);
-    isolates.add(iso);
+
+    isolate = await Isolate.spawn<Map<String, dynamic>>(_scan, args);
+    isolate!.addOnExitListener(p.sendPort);
 
     await for (var message in p) {
       if (message is SendPort) {
@@ -56,11 +56,10 @@ class LocalFileIsolate {
 
   void stop() async {
     //clear any isolates
-    for (Isolate i in isolates) {
-      i.kill(priority: Isolate.immediate);
+    if (isolate != null) {
+      isolate!.kill(priority: Isolate.immediate);
       logger.w('Killed local file scanner');
     }
-    isolates.clear();
   }
 
   //Method will run in Isolate

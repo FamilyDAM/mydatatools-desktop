@@ -83,7 +83,7 @@ class ScannerManager {
         break;
       case "email.gmail":
         print("Start '${c.scanner}' scanner for ${c.name} | ${c.path}");
-        CollectionScanner s = GmailScanner(database, c, fileDir.path, Duration.secondsPerDay);
+        CollectionScanner s = GmailScanner(database.config.path, c, fileDir.path);
         s.start(c, c.path, true, false);
         scanners.putIfAbsent(c.id, () => s);
         break;

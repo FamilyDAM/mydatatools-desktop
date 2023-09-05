@@ -13,67 +13,67 @@ import 'package:http/http.dart' as http;
 import 'package:client/oauth/desktop_oauth_manager.dart';
 import 'package:realm/realm.dart';
 
-enum LoginProvider { google, azure }
+enum LoginProviders { google, azure }
 
 ///
 /// Based on this stackoverflow answer
 /// https://stackoverflow.com/questions/68716993/google-microsoft-oauth2-login-flow-flutter-desktop-macos-windows-linux
-extension LoginProviderExtension on LoginProvider {
+extension LoginProviderExtension on LoginProviders {
   String get key {
     switch (this) {
-      case LoginProvider.google:
+      case LoginProviders.google:
         return 'google';
-      case LoginProvider.azure:
+      case LoginProviders.azure:
         return 'azure';
     }
   }
 
   String get authorizationEndpoint {
     switch (this) {
-      case LoginProvider.google:
+      case LoginProviders.google:
         return "https://accounts.google.com/o/oauth2/v2/auth";
-      case LoginProvider.azure:
+      case LoginProviders.azure:
         return "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
     }
   }
 
   String get tokenEndpoint {
     switch (this) {
-      case LoginProvider.google:
+      case LoginProviders.google:
         return "https://oauth2.googleapis.com/token";
-      case LoginProvider.azure:
+      case LoginProviders.azure:
         return "https://login.microsoftonline.com/common/oauth2/v2.0/token";
     }
   }
 
   String get clientId {
     switch (this) {
-      case LoginProvider.google:
+      case LoginProviders.google:
         return "279909695629-gmhsdqgh5jsrpq2nnd2aeisecpm1qrhq.apps.googleusercontent.com";
-      case LoginProvider.azure:
+      case LoginProviders.azure:
         return "AZURE_CLIENT_ID";
     }
   }
 
   String get clientSecret {
     switch (this) {
-      case LoginProvider.google:
+      case LoginProviders.google:
         return "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"; // if applicable
-      case LoginProvider.azure:
+      case LoginProviders.azure:
         return "AZURE_SECRET"; // if applicable
     }
   }
 
   List<String> get scopes {
     switch (this) {
-      case LoginProvider.google:
+      case LoginProviders.google:
         return [
           'https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
           'https://www.googleapis.com/auth/user.emails.read',
           'https://www.googleapis.com/auth/gmail.readonly',
         ]; // if applicable
-      case LoginProvider.azure:
+      case LoginProviders.azure:
         return ['openid', 'email']; // OAuth Scopes
     }
   }
@@ -84,7 +84,7 @@ extension LoginProviderExtension on LoginProvider {
     //todo: Security Assessment will be required
     //@see https://support.google.com/cloud/answer/9110914#zippy=%2Cgmail-api%2Cexceptions-to-verification-requirements%2Csteps-to-prepare-for-verification%2Csteps-for-apps-requesting-sensitive-scopes%2Csteps-for-apps-requesting-restricted-scopes%2Csteps-to-submit-your-app%2Csecurity-assessment
     if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-      final provider = DesktopOAuthManager(loginProvider: LoginProvider.google);
+      final provider = DesktopOAuthManager(loginProvider: LoginProviders.google);
 
       var client = await provider.login();
       //print('token=${client.credentials.accessToken}');

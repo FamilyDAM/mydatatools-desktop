@@ -98,27 +98,35 @@ class CollectionWatcherIsolate {
   void _watchFolders(Realm database) {
     folderSubs = database.all<Folder>().changes.listen((changes) {
       if (changes.inserted.isNotEmpty) {
-        for (var e in changes.inserted) {
+        for (var idx in changes.inserted) {
+          Folder f = changes.results[idx];
+
           //var obj = database.all<Folder>().elementAt(e);
           //logger.d('[Folder] inserted | ${obj.path}');
-          logger.d('[Folder] inserted | $e');
+          logger.d('[Folder] inserted | ${f.path} | ${f.collectionId}');
           //todo sync record
         }
       }
       if (changes.modified.isNotEmpty) {
-        for (var e in changes.modified) {
-          //var obj = database.all<Folder>().elementAt(e);
-          //logger.d('[Folder] modified | ${obj.path}');
-          logger.d('[Folder] modified | $e');
-          //todo sync record
+        if (changes.modified.isNotEmpty) {
+          for (var idx in changes.modified) {
+            Folder f = changes.results[idx];
+            //var obj = database.all<Folder>().elementAt(e);
+            //logger.d('[Folder] modified | ${obj.path}');
+            logger.d('[Folder] modified | ${f.path} | ${f.collectionId}');
+            //todo sync record
+          }
         }
       }
       if (changes.deleted.isNotEmpty) {
-        for (var e in changes.deleted) {
-          //var obj = database.all<Folder>().elementAt(e);
-          //logger.d('[Folder] deleted | $obj');
-          logger.d('[Folder] deleted | $e');
-          //todo sync record
+        if (changes.deleted.isNotEmpty) {
+          for (var idx in changes.deleted) {
+            Folder f = changes.results[idx];
+            //var obj = database.all<Folder>().elementAt(e);
+            //logger.d('[Folder] deleted | $obj');
+            logger.d('[Folder] deleted | ${f.path} | ${f.collectionId}');
+            //todo sync record
+          }
         }
       }
     });
@@ -149,19 +157,25 @@ class CollectionWatcherIsolate {
         }
       }
       if (changes.modified.isNotEmpty) {
-        for (var e in changes.modified) {
-          //var obj = database.all<File>().elementAt(e);
-          //logger.d('[File] modified | ${obj.path}');
-          //logger.d('[File] modified | $e');
-          //todo sync record
+        if (changes.modified.isNotEmpty) {
+          for (var idx in changes.modified) {
+            File file = changes.results[idx];
+            //var obj = database.all<File>().elementAt(e);
+            //logger.d('[File] modified | ${obj.path}');
+            //logger.d('[File] modified | $e');
+            //todo sync record
+          }
         }
       }
       if (changes.deleted.isNotEmpty) {
-        for (var e in changes.deleted) {
-          //var obj = database.all<File>().elementAt(e);
-          //logger.d('[File] deleted | $obj');
-          logger.d('[File] deleted | $e');
-          //todo sync record
+        if (changes.deleted.isNotEmpty) {
+          for (var idx in changes.deleted) {
+            File file = changes.results[idx];
+            //var obj = database.all<File>().elementAt(e);
+            //logger.d('[File] deleted | $obj');
+            logger.d('[File] deleted | $e');
+            //todo sync record
+          }
         }
       }
     });
@@ -174,24 +188,30 @@ class CollectionWatcherIsolate {
         for (var e in changes.inserted) {
           var obj = database.all<Email>().elementAt(e);
           //logger.d('[Email] inserted | $obj');
-          logger.d('[Email] inserted | $obj.subject');
+          //logger.d('[Email] inserted | $obj.subject');
           //todo sync record
         }
       }
       if (changes.modified.isNotEmpty) {
-        for (var e in changes.modified) {
-          //var obj = database.all<Email>().elementAt(e);
-          //logger.d('[Email] modified | $obj');
-          logger.d('[Email] modified | $e');
-          //todo sync record
+        if (changes.modified.isNotEmpty) {
+          for (var e in changes.modified) {
+            var obj = database.all<Email>().elementAt(e);
+            //var obj = database.all<Email>().elementAt(e);
+            //logger.d('[Email] modified | $obj');
+            //logger.d('[Email] modified | $e');
+            //todo sync record
+          }
         }
       }
       if (changes.deleted.isNotEmpty) {
-        for (var e in changes.deleted) {
-          //var obj = database.all<Email>().elementAt(e);
-          //logger.d('[Email] deleted | $obj');
-          logger.d('[Email] deleted | $e');
-          //todo sync record
+        if (changes.deleted.isNotEmpty) {
+          for (var e in changes.deleted) {
+            var obj = database.all<Email>().elementAt(e);
+            //var obj = database.all<Email>().elementAt(e);
+            //logger.d('[Email] deleted | $obj');
+            //logger.d('[Email] deleted | $e');
+            //todo sync record
+          }
         }
       }
     });
