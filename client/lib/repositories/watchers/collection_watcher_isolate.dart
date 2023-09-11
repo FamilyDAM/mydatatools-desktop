@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:async';
 import 'dart:isolate';
 
@@ -159,7 +161,7 @@ class CollectionWatcherIsolate {
       if (changes.modified.isNotEmpty) {
         if (changes.modified.isNotEmpty) {
           for (var idx in changes.modified) {
-            File file = changes.results[idx];
+            //File file = changes.results[idx];
             //var obj = database.all<File>().elementAt(e);
             //logger.d('[File] modified | ${obj.path}');
             //logger.d('[File] modified | $e');
@@ -170,10 +172,10 @@ class CollectionWatcherIsolate {
       if (changes.deleted.isNotEmpty) {
         if (changes.deleted.isNotEmpty) {
           for (var idx in changes.deleted) {
-            File file = changes.results[idx];
+            File f = changes.results[idx];
             //var obj = database.all<File>().elementAt(e);
             //logger.d('[File] deleted | $obj');
-            logger.d('[File] deleted | $e');
+            //logger.d('[File] deleted | $f');
             //todo sync record
           }
         }

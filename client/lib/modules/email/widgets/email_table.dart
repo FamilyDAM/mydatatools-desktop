@@ -39,6 +39,7 @@ class _EmailTable extends State<EmailTable> {
                   sortColumnIndex: sortColumnIndex,
                   sortAscending: sortAsc,
                   showCheckboxColumn: true,
+                  showFirstLastButtons: true,
                   rowsPerPage: calcRows,
                   /**
                    rowsPerPage: preferredRows

@@ -6,7 +6,8 @@ import 'package:rxdart/rxdart.dart';
 class AppLogger extends Logger {
   SendPort? sendPort;
 
-  AppLogger(SendPort? sendPort_) : super(printer: SimplePrinter()) {
+  //AppLogger(SendPort? sendPort_) : super(printer: SimplePrinter()) {
+  AppLogger(SendPort? sendPort_) : super(printer: PrettyPrinter()) {
     sendPort = sendPort_;
   }
 

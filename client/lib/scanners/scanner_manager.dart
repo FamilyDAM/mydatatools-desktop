@@ -59,10 +59,18 @@ class ScannerManager {
   }
 
   void stopScanners() {
-    for (var key in scanners.keys) {
-      scanners[key]!.stop();
-      scanners.remove(key);
+    try {
+      for (var key in scanners.keys) {
+        scanners[key]!.stop();
+        scanners.remove(key);
+      }
+    } catch (error) {
+      //print(error);
     }
+  }
+
+  void startScanner(Collection c) {
+    //todo, not implemented yet
   }
 
   CollectionScanner? getScanner(Collection c) {

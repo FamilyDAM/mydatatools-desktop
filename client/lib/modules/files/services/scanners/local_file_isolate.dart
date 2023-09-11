@@ -57,7 +57,7 @@ class LocalFileIsolate {
   void stop() async {
     //clear any isolates
     if (isolate != null) {
-      isolate!.kill(priority: Isolate.immediate);
+      isolate!.kill(priority: Isolate.beforeNextEvent);
       logger.w('Killed local file scanner');
     }
   }
@@ -143,18 +143,17 @@ class LocalFileIsolate {
     FileSystemRepository repo = FileSystemRepository(database);
     Map<String, DateTime> existingFolders = {};
     repo.folders(collectionId, parent).forEach((e) {
-      existingFolders.putIfAbsent(e.path, () => e.lastModified);
+      existingFolders.putIfAbsent('${e.collectionId}:${e.path}', () => e.lastModified);
     });
 
     Map<String, DateTime> existingFiles = {};
     repo.files(collectionId, parent).forEach((e) {
-      existingFolders.putIfAbsent(e.path, () => e.lastModified);
+      existingFiles.putIfAbsent('${e.collectionId}:${e.path}', () => e.lastModified);
     });
 
     //First Save all the Directories
     List<io.Directory> dirList = files.whereType<io.Directory>().toList();
     while (dirList.isNotEmpty) {
-      logger.s("Saving Directories");
       //var start = DateTime.now().millisecondsSinceEpoch;
       //pull out batch, so we don't lock ui trying to save too many folders
       batchFolderSize = min(batchFolderSize, dirList.length);
@@ -168,8 +167,11 @@ class LocalFileIsolate {
       var validFolders = await _validateFolders(existingFolders, collectionId, range);
 
       //save files w/pause
-      int saveCount = await repo.addFolders(validFolders);
-      count += saveCount;
+      if (validFolders.isNotEmpty) {
+        logger.s("Saving Directories");
+        int saveCount = await repo.addFolders(validFolders);
+        count += saveCount;
+      }
       //logger.d('[${DateTime.now().millisecondsSinceEpoch - st1art}ms] Saving Dir Complete: ${validFolders.length}');
     }
 
@@ -177,7 +179,6 @@ class LocalFileIsolate {
     List<io.File> fileList = files.whereType<io.File>().toList();
     int total = fileList.length;
     int completed = 0;
-    logger.s("Saving Files");
     while (fileList.isNotEmpty) {
       //var start = DateTime.now().millisecondsSinceEpoch;
       //pull out batch, so we don't lock ui trying to save too many files
@@ -195,10 +196,12 @@ class LocalFileIsolate {
       if (validFiles.isEmpty) break;
 
       //save files w/pause
-      completed += validFiles.length;
-      logger.s("Saving $completed / $total files");
-      int saveCount = await repo.addFiles(validFiles);
-      count += saveCount;
+      if (validFiles.isNotEmpty) {
+        completed += validFiles.length;
+        logger.s("Saving $completed / $total files");
+        int saveCount = await repo.addFiles(validFiles);
+        count += saveCount;
+      }
       //logger.s('[${DateTime.now().millisecondsSinceEpoch - start}ms] Saving Files Complete: ${validFiles.length}');
     }
     logger.s(""); //clear status

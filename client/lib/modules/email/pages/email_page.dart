@@ -126,6 +126,12 @@ class _EmailPage extends State<EmailPage> {
                     .showSnackBar(const SnackBar(content: Text('todo: delete selected messages')));
               },
             ),
+            const IconButton(
+              //todo: disable is no files are checked
+              icon: Icon(Icons.settings, color: Colors.black),
+              tooltip: 'Collection Settings',
+              onPressed: null,
+            ),
           ],
         ),
         body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

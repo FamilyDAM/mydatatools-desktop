@@ -12,6 +12,7 @@ import 'package:client/models/collection_model.dart';
 import 'package:client/models/module_models.dart';
 import 'package:client/repositories/watchers/collection_watcher_isolate.dart';
 import 'package:client/scanners/scanner_manager.dart';
+import 'package:client/services/get_user_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:realm/realm.dart';
@@ -90,16 +91,17 @@ class RealmRepository {
     CollectionWatcherIsolate collectionWatcherIsolate = CollectionWatcherIsolate(config.path, token);
     //start isolate version of the collection watcher
     Isolate.spawn<SendPort>(collectionWatcherIsolate.start, myReceivePort.sendPort);
-
-    //_watchCollections();
-    //_watchFolders();
-    //_watchFiles();
-    //_watchEmails();
   }
 
   /// Start up a scanner for each collection
   void _initializeScanners() {
-    scannerManager = ScannerManager(database);
+    GetUserService.instance.sink.listen((e) {
+      if (e == null) {
+        scannerManager?.stopScanners();
+      } else {
+        scannerManager = ScannerManager(database);
+      }
+    });
   }
 
   /// Make sure each app is in database
@@ -130,114 +132,4 @@ class RealmRepository {
       rethrow;
     }
   }
-
-  /**
-  /// Listen for object changes in 'Collection'
-  void _watchCollections() {
-    collectionSubs = database.all<Collection>().changes.listen((changes) {
-      if (changes.inserted.isNotEmpty) {
-        for (var e in changes.inserted) {
-          //var obj = database.all<Collection>().elementAt(e);
-          //logger.d('[Collection] inserted | $obj');
-          //todo sync record
-        }
-      }
-      if (changes.modified.isNotEmpty) {
-        for (var e in changes.modified) {
-          //var obj = database.all<Collection>().elementAt(e);
-          //logger.d('[Collection] modified | $obj');
-          //todo sync record
-        }
-      }
-      if (changes.deleted.isNotEmpty) {
-        for (var e in changes.deleted) {
-          //var obj = database.all<Collection>().elementAt(e);
-          //logger.d('[Collection] deleted | $obj');
-          //todo sync record
-        }
-      }
-    });
-  }
-
-  /// Listen for object changes in 'Folder'
-  void _watchFolders() {
-    folderSubs = database.all<Folder>().changes.listen((changes) {
-      if (changes.inserted.isNotEmpty) {
-        for (var e in changes.inserted) {
-          //var obj = database.all<Folder>().elementAt(e);
-          //logger.d('[Folder] inserted | ${obj.path}');
-          //todo sync record
-        }
-      }
-      if (changes.modified.isNotEmpty) {
-        for (var e in changes.modified) {
-          //var obj = database.all<Folder>().elementAt(e);
-          //logger.d('[Folder] modified | ${obj.path}');
-          //todo sync record
-        }
-      }
-      if (changes.deleted.isNotEmpty) {
-        for (var e in changes.deleted) {
-          //var obj = database.all<Folder>().elementAt(e);
-          //logger.d('[Folder] deleted | $obj');
-          //todo sync record
-        }
-      }
-    });
-  }
-
-  /// Listen for object changes in 'File'
-  void _watchFiles() {
-    fileSubs = database.all<File>().changes.listen((changes) {
-      if (changes.inserted.isNotEmpty) {
-        for (var e in changes.inserted) {
-          //var obj = database.all<File>().elementAt(e);
-          //logger.d('[File] inserted | ${obj.path}');
-          //todo sync record
-        }
-      }
-      if (changes.modified.isNotEmpty) {
-        for (var e in changes.modified) {
-          //var obj = database.all<File>().elementAt(e);
-          //logger.d('[File] modified | ${obj.path}');
-          //todo sync record
-        }
-      }
-      if (changes.deleted.isNotEmpty) {
-        for (var e in changes.deleted) {
-          //var obj = database.all<File>().elementAt(e);
-          //logger.d('[File] deleted | $obj');
-          //todo sync record
-        }
-      }
-    });
-  }
-
-  /// Listen for object changes in 'Email'
-  void _watchEmails() {
-    emailSubs = database.all<Email>().changes.listen((changes) {
-      if (changes.inserted.isNotEmpty) {
-        for (var e in changes.inserted) {
-          //var obj = database.all<Email>().elementAt(e);
-          //logger.d('[Email] inserted | $obj');
-          //todo sync record
-        }
-      }
-      if (changes.modified.isNotEmpty) {
-        for (var e in changes.modified) {
-          //var obj = database.all<Email>().elementAt(e);
-          //logger.d('[Email] modified | $obj');
-          //todo sync record
-        }
-      }
-      if (changes.deleted.isNotEmpty) {
-        for (var e in changes.deleted) {
-          //var obj = database.all<Email>().elementAt(e);
-          //logger.d('[Email] deleted | $obj');
-          //todo sync record
-        }
-      }
-    });
-  }
-  **/
 }

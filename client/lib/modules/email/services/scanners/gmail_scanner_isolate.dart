@@ -38,15 +38,15 @@ class GmailScannerIsolate {
     isolate = await Isolate.spawn<Map<String, dynamic>>(_scan, args);
     isolate!.addOnExitListener(p.sendPort);
 
-    await for (var message in p) {
-      if (message is SendPort) {
-        // connected
-        logger.i(message);
-      } else if (message == null) {
-        //logger.i("Scan Complete");
-        return Future(() => -1);
+    p.listen((message) {
+      if (message is String) {
+        if (message == "command:refresh") {
+          EmailService.instance.invoke(EmailServiceCommand(collection, "date", false));
+        } else {
+          //todo
+        }
       }
-    }
+    });
 
     return Future(() => 0);
   }
@@ -54,7 +54,7 @@ class GmailScannerIsolate {
   void stop() async {
     //clear any isolates
     if (isolate != null) {
-      isolate!.kill(priority: Isolate.immediate);
+      isolate!.kill(priority: Isolate.beforeNextEvent);
       logger.w('Killed local file scanner');
     }
   }
@@ -122,14 +122,13 @@ class GmailScannerIsolate {
   Future<int> _getNewestEmails(EmailRepository emailRepository, Collection collection, String accessToken) async {
     // Check token and refresh if needed
     DateTime? maxDate = emailRepository.getMaxEmailDate(collection.id);
-    String? maxQuery = '5d';
+    String? maxQuery = 'in:inbox';
     if (maxDate != null) {
       maxQuery = "after:${(maxDate.millisecondsSinceEpoch / 1000).floor()}";
     }
 
     //get new emails
     var count = await _pullEmails(emailRepository, collection, maxQuery, true, false, null, collection.accessToken);
-    EmailService.instance!.invoke(EmailServiceCommand(collection, "date", false));
 
     return Future(() => count);
   }
@@ -142,7 +141,6 @@ class GmailScannerIsolate {
 
       //get new emails
       count = await _pullEmails(emailRepository, collection, minQuery, true, false, null, collection.accessToken);
-      EmailService.instance!.invoke(EmailServiceCommand(collection, "date", false));
     }
     return Future(() => count);
   }
@@ -153,7 +151,6 @@ class GmailScannerIsolate {
     String query = "in:trash";
     //get new emails
     count = await _deleteEmails(emailRepository, collection, query, false, true, null, collection.accessToken);
-    EmailService.instance!.invoke(EmailServiceCommand(collection, "date", false));
 
     return Future(() => count);
   }
@@ -164,7 +161,6 @@ class GmailScannerIsolate {
     String query = "in:spam";
     //get new emails
     count = await _deleteEmails(emailRepository, collection, query, false, true, null, collection.accessToken);
-    EmailService.instance!.invoke(EmailServiceCommand(collection, "date", false));
 
     return Future(() => count);
   }
@@ -228,8 +224,14 @@ class GmailScannerIsolate {
       String? htmlPayload = parseBodyParts(m.payload?.parts ?? [], "text/html");
       List<File> attachments = [];
       if (downloadAttachments) {
-        attachments = await parseAttachmentParts(accessToken!, collection, appDir, id,
-            int.parse(m.internalDate ?? DateTime.now().millisecondsSinceEpoch.toString()), m.payload?.parts ?? []);
+        attachments = await parseAttachmentParts(
+            accessToken!,
+            collection,
+            appDir,
+            id,
+            int.parse(m.internalDate ?? DateTime.now().millisecondsSinceEpoch.toString()),
+            msgDateTime,
+            m.payload?.parts ?? []);
       }
 
       //build object
@@ -247,10 +249,13 @@ class GmailScannerIsolate {
       emailBatch.add(email);
     }
 
-    logger.s("Saving ${emailBatch.length} emails");
-    //save emails
-    emailRepository.addEmails(collection.id, emailBatch);
-    logger.s("");
+    if (emailBatch.isNotEmpty) {
+      logger.s("Saving ${emailBatch.length} emails");
+      //save emails
+      emailRepository.addEmails(collection.id, emailBatch);
+      sendPort.send("command:refresh");
+      logger.s("");
+    }
 
     if (nextPageToken != null) {
       //print("get more messages");
@@ -317,10 +322,13 @@ class GmailScannerIsolate {
       e.isDeleted = true;
     }
 
-    logger.s("Deleting ${emailBatch.length} emails");
-    //save emails
-    emailRepository.deleteEmails(collection.id, emailBatch);
-    logger.s("");
+    if (emailBatch.isNotEmpty) {
+      logger.s("Deleting ${emailBatch.length} emails");
+      //save emails
+      emailRepository.deleteEmails(collection.id, emailBatch);
+      sendPort.send("command:refresh");
+      logger.s("");
+    }
 
     int count = 0;
     if (nextPageToken != null) {
@@ -391,7 +399,7 @@ class GmailScannerIsolate {
   /// The name of each attachment is the same as the name of the file in the Gmail message.
   ///
   Future<List<File>> parseAttachmentParts(String accessToken, Collection collection, String appDir, String messageId,
-      int epochDate, List<MessagePart> parts) async {
+      int epochDate, DateTime msgDateTime, List<MessagePart> parts) async {
     List<File> files = [];
     final AppLogger logger = AppLogger(null);
     for (var part in parts) {
@@ -425,8 +433,8 @@ class GmailScannerIsolate {
           file.writeAsBytesSync(base64.decode(apiMsg.data!));
 
           logger.v('Download Attachment: $fileName | dir:$dir | messageId: $messageId');
-          File f = File(Uuid.v4().toString(), collection.id, fileName, file.path, dir.path, DateTime.now(),
-              DateTime.now(), 0, contentType);
+          File f = File(Uuid.v4().toString(), collection.id, fileName, file.path, dir.path, msgDateTime, msgDateTime, 0,
+              contentType);
           files.add(f);
         } catch (e) {
           logger.w('Cannot parse attachment: $e | messageId: $messageId | part: $part');
