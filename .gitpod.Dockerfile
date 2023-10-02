@@ -1,9 +1,10 @@
 FROM gitpod/workspace-full-vnc:latest
 SHELL ["/bin/bash", "-c"]
 ENV ANDROID_HOME=$HOME/androidsdk \
-    FLUTTER_VERSION=3.10.5-stable \
+    FLUTTER_VERSION=3.13.6-stable \
     QTWEBENGINE_DISABLE_SANDBOX=1
 ENV PATH="$HOME/flutter/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+
 
 # Install Open JDK for android and other dependencies
 USER root
@@ -19,6 +20,7 @@ RUN install-packages \
         libnss3-dev \
         fonts-noto \
         fonts-noto-cjk 
+
         
 # Install libsecret to get flutter_secure_storage working
 RUN apt-get update -y && \
@@ -49,3 +51,4 @@ RUN wget -q "https://storage.googleapis.com/flutter_infra_release/releases/stabl
     && flutter config --android-sdk $ANDROID_HOME \
     && yes | flutter doctor --android-licenses \
     && flutter doctor
+
