@@ -32,10 +32,17 @@ class CollectionWatcherIsolate {
       BackgroundIsolateBinaryMessenger.ensureInitialized(token!);
     }
 
-    Configuration config = Configuration.local(
-        [Apps.schema, AppUser.schema, Collection.schema, Folder.schema, File.schema, Email.schema],
+    Configuration config = Configuration.local([
+      Apps.schema,
+      AppUser.schema,
+      Collection.schema,
+      Folder.schema,
+      File.schema,
+      Email.schema
+    ],
         schemaVersion: AppConstants.schemaVersion,
-        shouldDeleteIfMigrationNeeded: AppConstants.shouldDeleteIfMigrationNeeded,
+        shouldDeleteIfMigrationNeeded:
+            AppConstants.shouldDeleteIfMigrationNeeded,
         path: path);
 
     Realm database = Realm(config);
@@ -146,8 +153,10 @@ class CollectionWatcherIsolate {
 
           var latLng = await exifExtractor.extractLatLng(file);
           if (latLng != null) {
-            fileSystemRepository.updateProperty(file, "latitude", latLng['latitude']);
-            fileSystemRepository.updateProperty(file, "longitude", latLng['longitude']);
+            fileSystemRepository.updateProperty(
+                file, "latitude", latLng['latitude']);
+            fileSystemRepository.updateProperty(
+                file, "longitude", latLng['longitude']);
           }
 
           //var obj = database.all<File>().elementAt(e);
@@ -162,7 +171,7 @@ class CollectionWatcherIsolate {
             File file = changes.results[idx];
             //var obj = database.all<File>().elementAt(e);
             //logger.d('[File] modified | ${obj.path}');
-            //logger.d('[File] modified | $e');
+            //logger.d('[File] modified | $file');
             //todo sync record
           }
         }
@@ -173,7 +182,7 @@ class CollectionWatcherIsolate {
             File file = changes.results[idx];
             //var obj = database.all<File>().elementAt(e);
             //logger.d('[File] deleted | $obj');
-            logger.d('[File] deleted | $e');
+            logger.d('[File] deleted | $file');
             //todo sync record
           }
         }
