@@ -164,7 +164,7 @@ class CollectionWatcherIsolate {
             //File file = changes.results[idx];
             //var obj = database.all<File>().elementAt(e);
             //logger.d('[File] modified | ${obj.path}');
-            //logger.d('[File] modified | $e');
+            //logger.d('[File] modified | $file');
             //todo sync record
           }
         }
