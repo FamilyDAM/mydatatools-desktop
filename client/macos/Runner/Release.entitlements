@@ -23,6 +23,6 @@
     <key>com.apple.security.assets.documents.read-write</key>
     <true/>
     <key>com.apple.security.assets.desktop.read-write</key>
-    <true/>
+	<true/>
 </dict>
 </plist>

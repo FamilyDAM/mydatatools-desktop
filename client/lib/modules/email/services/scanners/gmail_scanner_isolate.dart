@@ -92,6 +92,7 @@ class GmailScannerIsolate {
     return database;
   }
 
+  /// Starting method to run in isolate
   Future<int> _scanEmail(Realm database, String collectionId) async {
     CollectionRepository collectionRepository = CollectionRepository(database);
     EmailRepository emailRepository = EmailRepository(database);
@@ -111,14 +112,22 @@ class GmailScannerIsolate {
 
     int count = 0;
     if (accessToken != null) {
+      //first get the newest emails since the last time we ran
       count += await _getNewestEmails(emailRepository, collection, accessToken);
+      //double check there are no old emails we missed (ex:app closed before sync completed)
       count += await _getOldestEmails(emailRepository, collection, accessToken);
+      //Check emails in trash and soft-delete from local repo and remove any attachments on disk
       count += await _getEmailsInTrashToDelete(emailRepository, collection, accessToken);
+      //Check emails in spam and soft-delete from local repo and remove any attachments on disk
       count += await _getEmailsInSpamToDelete(emailRepository, collection, accessToken);
     }
     return Future(() => count);
   }
 
+  /// Get the newest emails since the last time we ran
+  /// First it will find the newest date in the db and then pull all emails since that date
+  /// This will follow the 'nexttoken' from the api reponse to page through all emails
+  /// This will save all attachements to the local disk
   Future<int> _getNewestEmails(EmailRepository emailRepository, Collection collection, String accessToken) async {
     // Check token and refresh if needed
     DateTime? maxDate = emailRepository.getMaxEmailDate(collection.id);
@@ -133,6 +142,10 @@ class GmailScannerIsolate {
     return Future(() => count);
   }
 
+  /// Get any old emails we might have missed on initial sync
+  /// First it will find the oldest date in the db and then pull all emails before that date
+  /// This will follow the 'nexttoken' from the api reponse to page through all emails
+  /// This will save all attachements to the local disk
   Future<int> _getOldestEmails(EmailRepository emailRepository, Collection collection, String accessToken) async {
     int count = 0;
     DateTime? minDate = emailRepository.getMinEmailDate(collection.id);
@@ -145,6 +158,8 @@ class GmailScannerIsolate {
     return Future(() => count);
   }
 
+  /// Find all emails in trash and delete them from the local db
+  /// This will delete any attachments saved to local disk too.
   Future<int> _getEmailsInTrashToDelete(
       EmailRepository emailRepository, Collection collection, String accessToken) async {
     int count = 0;
@@ -155,6 +170,9 @@ class GmailScannerIsolate {
     return Future(() => count);
   }
 
+  /// Find all emails in spam and delete them from the local db if they originally came in the inbox.
+  /// Emails filtered by gmail will not be in local db.
+  /// This will delete any attachments saved to local disk too.
   Future<int> _getEmailsInSpamToDelete(
       EmailRepository emailRepository, Collection collection, String accessToken) async {
     int count = 0;
@@ -302,7 +320,7 @@ class GmailScannerIsolate {
 
     ListMessagesResponse messagesResponse = await gmailApi.users.messages.list(collection.name,
         includeSpamTrash: includeSpamTrash,
-        maxResults: 250,
+        maxResults: 50,
         pageToken: pageToken, //todo, remove
         q: query_);
 

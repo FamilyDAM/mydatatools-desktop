@@ -49,7 +49,8 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
   }
 
   onStepContinueHandler(BuildContext context, AppUser? appUser_, int step) {
-    String supportDir = AppRouter.supportDirectory.value as String;
+    var sDir = AppRouter.supportDirectory.value;
+    String supportDir = (sDir is String) ? sDir : sDir.path as String;
 
     //update user
     appUser = appUser_;

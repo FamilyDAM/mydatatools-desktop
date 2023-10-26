@@ -6,6 +6,7 @@ import 'package:client/models/module_models.dart';
 import 'package:client/modules/email/notifications/email_sort_changed_notification.dart';
 import 'package:client/modules/email/pages/new_email_page.dart';
 import 'package:client/modules/email/services/email_service.dart';
+import 'package:client/modules/email/widgets/email_details.dart';
 import 'package:client/modules/email/widgets/email_table.dart';
 import 'package:client/scanners/scanner_manager.dart';
 import 'package:client/services/get_collections_service.dart';
@@ -35,6 +36,8 @@ class _EmailPage extends State<EmailPage> {
   List<Email> emails = [];
   String sortColumn = 'date';
   bool sortAsc = false;
+  String emailLayout = 'vertical';
+  Email? selectedEmail;
 
   @override
   void initState() {
@@ -126,6 +129,28 @@ class _EmailPage extends State<EmailPage> {
                     .showSnackBar(const SnackBar(content: Text('todo: delete selected messages')));
               },
             ),
+            IconButton(
+                //todo: disable is no files are checked
+                icon: const Icon(Icons.vertical_split, color: Colors.black),
+                tooltip: 'Vertical layout',
+                onPressed: (emailLayout == 'vertical')
+                    ? null
+                    : () {
+                        setState(() {
+                          emailLayout = 'vertical';
+                        });
+                      }),
+            IconButton(
+                //todo: disable is no files are checked
+                icon: const Icon(Icons.horizontal_split, color: Colors.black),
+                tooltip: 'Side by Side Layout',
+                onPressed: (emailLayout == 'horizontal')
+                    ? null
+                    : () {
+                        setState(() {
+                          emailLayout = 'horizontal';
+                        });
+                      }),
             const IconButton(
               //todo: disable is no files are checked
               icon: Icon(Icons.settings, color: Colors.black),
@@ -136,10 +161,25 @@ class _EmailPage extends State<EmailPage> {
         ),
         body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           NotificationListener<EmailSortChangedNotification>(
-              child: EmailTable(
-                count: count,
-                emails: emails,
-              ),
+              child: (emailLayout == 'vertical')
+                  ? Column(children: [
+                      EmailTable(
+                        count: count,
+                        emails: emails,
+                      ),
+                      (selectedEmail != null)
+                          ? EmailDetails(email: selectedEmail!)
+                          : const SizedBox(width: 0, height: 0),
+                    ])
+                  : Row(children: [
+                      EmailTable(
+                        count: count,
+                        emails: emails,
+                      ),
+                      (selectedEmail != null)
+                          ? EmailDetails(email: selectedEmail!)
+                          : const SizedBox(width: 0, height: 0),
+                    ]),
               onNotification: (EmailSortChangedNotification n) {
                 sortColumn = n.sortColumn;
                 sortAsc = n.sortAsc;

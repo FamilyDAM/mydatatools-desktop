@@ -32,16 +32,16 @@ class _SetupStep2State extends State<SetupStep2> {
     var appUser = widget.appUser;
 
     if (storageForm.valid && appUser != null) {
-      var path = AppRouter.supportDirectory.value;
-      appUser.localStoragePath = path;
+      var supportDir = AppRouter.supportDirectory.value;
+      appUser.localStoragePath = (supportDir is Directory) ? supportDir.path : supportDir;
 
       try {
         errorMessage = null;
         //Check directories as needed
-        var dir = Directory(path);
-        var keysDir = Directory("$path${Platform.pathSeparator}keys");
-        var dbDir = Directory("$path${Platform.pathSeparator}data");
-        var repoDir = Directory("$path${Platform.pathSeparator}files");
+        var dir = Directory(appUser.localStoragePath);
+        var keysDir = Directory("${appUser.localStoragePath}${Platform.pathSeparator}keys");
+        var dbDir = Directory("${appUser.localStoragePath}${Platform.pathSeparator}data");
+        var repoDir = Directory("${appUser.localStoragePath}${Platform.pathSeparator}files");
         if (!dir.existsSync()) {
           dir.createSync(recursive: true);
         }
@@ -68,8 +68,11 @@ class _SetupStep2State extends State<SetupStep2> {
   @override
   Widget build(BuildContext context) {
     //handle async setup for validators
-    var path = AppRouter.supportDirectory.value;
-    storageForm.findControl('storageLocation')?.value = path;
+    var dir = AppRouter.supportDirectory.value;
+    var field = storageForm.findControl('storageLocation');
+    if (field != null) {
+      field.value = (dir is String) ? dir : dir.path;
+    }
 
     return ReactiveForm(
       formGroup: storageForm,

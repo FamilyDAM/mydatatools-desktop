@@ -11,6 +11,13 @@
             "type": "dart"
         },
         {
+            "name": "client (impeller)",
+            "cwd": "client",
+            "request": "launch",
+            "type": "dart", 
+            "args": ["--enable-impeller"]
+        },
+        {
             "name": "client (profile mode)",
             "cwd": "client",
             "request": "launch",

@@ -1,6 +1,6 @@
 class AppConstants {
   static const String realmName = "mydata.tools";
-  static const String appName = "com.familydam.client";
+  static const String appName = "MyDataTools";
   static const String configFileName = "config.json";
   static const String dbFileName = "metadata.realm";
 
