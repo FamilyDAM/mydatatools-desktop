@@ -3,11 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>com.apple.security.app-sandbox</key>
-	<true/>
+	<false/>
 	<key>com.apple.security.cs.allow-jit</key>
 	<true/>
-	<key>com.apple.security.app-sandbox</key>
-	<false/>
 	<key>com.apple.security.network.server</key>
 	<true/>
 	<key>com.apple.security.network.client</key>
@@ -27,6 +25,6 @@
     <key>com.apple.security.assets.documents.read-write</key>
     <true/>
     <key>com.apple.security.assets.desktop.read-write</key>
-	<true/>	
+    <true/>
 </dict>
 </plist>
