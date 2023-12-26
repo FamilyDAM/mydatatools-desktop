@@ -4,11 +4,42 @@ on:
   push:
     branches: [ "develop" ]
 jobs:
-  log:
-    runs-on: ubuntu-linux
+  build-and-release-linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client
     steps:
-      - run: echo "build script for MyData/Tools Desktop Application"
-      
+      # checkout dir
+      - uses: actions/checkout@v3
+      # Install flutter & build
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:' # optional, change this to force refresh cache
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
+      - run: |
+          sudo apt-get update -y
+          sudo apt-get install -y cmake ninja-build libgtk-3-dev libnss3-dev fonts-noto fonts-noto-cjk libstdc++-10-dev
+      - run: cmake --version
+      - run: flutter config --enable-linux-desktop
+      - run: flutter --version  
+      - name: install flutter libs
+        run: flutter pub get
+      - name: install realm
+        run: dart run realm install --target-os-type linux --flavor flutter --debug
+      - name: build linux
+        run: flutter build linux --no-tree-shake-icons --release
+#      # Collect the file and upload as artifact         
+#      - name: collect ipa artifacts
+#        uses: actions/upload-artifact@v2
+#        with:
+#         name: release-ipa
+#         # Path to the release files
+#         path: build/linux/*
+
+
 #  build-and-release-windows:
 #    runs-on: windows-latest
 #    defaults:
@@ -39,38 +70,6 @@ jobs:
 #         path: build/linux/*
 
 
-#  build-and-release-linux:
-#    runs-on: ubuntu-latest
-#    defaults:
-#      run:
-#        working-directory: ./client
-#    steps:
-#      # checkout dir
-#      - uses: actions/checkout@v3
-#      # Install flutter & build
-#      - uses: subosito/flutter-action@v2
-#        with:
-#          channel: 'stable'
-#          cache: true
-#          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:' # optional, change this to force refresh cache
-#          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
-#      - run: |
-#          sudo apt-get update -y
-#          sudo apt-get install -y cmake ninja-build libgtk-3-dev
-#      - run: cmake --version
-#      - run: flutter config --enable-linux-desktop
-#      - run: flutter --version  
-#      - name: install flutter libs
-#        run: flutter pub get
-#      - name: build linux
-#        run: flutter build linux --no-tree-shake-icons --release
-#      # Collect the file and upload as artifact         
-#      - name: collect ipa artifacts
-#        uses: actions/upload-artifact@v2
-#        with:
-#         name: release-ipa
-#         # Path to the release files
-#         path: build/linux/*
 
 # build-and-release-macos:
 #   runs-on: macos-latest
