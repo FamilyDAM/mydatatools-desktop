@@ -1,7 +1,7 @@
 FROM gitpod/workspace-full-vnc:latest
 SHELL ["/bin/bash", "-c"]
 ENV ANDROID_HOME=$HOME/androidsdk \
-    FLUTTER_VERSION=3.13.6-stable \
+    FLUTTER_VERSION=3.16.5-stable \
     QTWEBENGINE_DISABLE_SANDBOX=1
 ENV PATH="$HOME/flutter/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
@@ -16,6 +16,7 @@ ENV JAVA_HOME=/home/gitpod/.sdkman/candidates/java/current
 
 # Install  other dependencies
 RUN install-packages \
+        cmake \
         libgtk-3-dev \
         libnss3-dev \
         fonts-noto \
@@ -27,8 +28,8 @@ RUN install-packages \
 # apt-get install --no-install-recommends -y libsecret-1-0 git && \
 # apt-get install -y libjsoncpp-dev
 
-RUN apt-get install libsecret-1-dev
-RUN apt-get install -y libjsoncpp
+# RUN apt-get install libsecret-1-dev
+# RUN apt-get install -y libjsoncpp
 
 # Make some changes for our vnc client and flutter chrome
 # RUN sed -i 's|resize=scale|resize=remote|g' /opt/novnc/index.html \
