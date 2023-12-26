@@ -17,7 +17,8 @@ jobs:
           architecture: x64
       - run: flutter config --enable-macos-desktop
       - run: flutter --version    
-      - run: pwd
+      - name: print directory
+        run: pwd
       - name: install flutter libs
         run: flutter pub get
       - name: build macos
