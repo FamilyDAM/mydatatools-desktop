@@ -4,34 +4,39 @@ on:
   push:
     branches: [ "develop" ]
 jobs:
-  build-and-release-windows:
-    runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: ./client
+  log:
+    runs-on: ubuntu-linux
     steps:
-      # checkout dir
-      - uses: actions/checkout@v3
-      # Install flutter & build
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:' # optional, change this to force refresh cache
-          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
-      - uses: microsoft/setup-msstore-cli@v1
-      - name: Configure the Microsoft Store CLI
-        run: msstore reconfigure --tenantId $ --clientId $ --clientSecret $ --sellerId $
-      - name: Create MSIX
-        run: msstore package .
+      - run: echo "build script for MyData/Tools Desktop Application"
+      
+#  build-and-release-windows:
+#    runs-on: windows-latest
+#    defaults:
+#      run:
+#        working-directory: ./client
+#    steps:
+#      # checkout dir
+#      - uses: actions/checkout@v3
+#      # Install flutter & build
+#      - uses: subosito/flutter-action@v2
+#        with:
+#          channel: 'stable'
+#          cache: true
+#          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:' # optional, change this to force refresh cache
+#          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
+#      - uses: microsoft/setup-msstore-cli@v1
+#      - name: Configure the Microsoft Store CLI
+#        run: msstore reconfigure --tenantId $ --clientId $ --clientSecret $ --sellerId $
+#      - name: Create MSIX
+#        run: msstore package .
 
-      # Collect the file and upload as artifact         
-      # - name: collect ipa artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #    name: release-ipa
-      #    # Path to the release files
-      #    path: build/linux/*
+#      # Collect the file and upload as artifact         
+#      - name: collect ipa artifacts
+#        uses: actions/upload-artifact@v2
+#        with:
+#         name: release-ipa
+#         # Path to the release files
+#         path: build/linux/*
 
 
 #  build-and-release-linux:
@@ -59,14 +64,13 @@ jobs:
 #        run: flutter pub get
 #      - name: build linux
 #        run: flutter build linux --no-tree-shake-icons --release
-
-      # Collect the file and upload as artifact         
-      # - name: collect ipa artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #    name: release-ipa
-      #    # Path to the release files
-      #    path: build/linux/*
+#      # Collect the file and upload as artifact         
+#      - name: collect ipa artifacts
+#        uses: actions/upload-artifact@v2
+#        with:
+#         name: release-ipa
+#         # Path to the release files
+#         path: build/linux/*
 
 # build-and-release-macos:
 #   runs-on: macos-latest
@@ -116,14 +120,11 @@ jobs:
 #       run: flutter pub get
 #     - name: build macos
 #       run: flutter build macos --no-tree-shake-icons --release
-      
 #     #Build Binary Installations
 #     - uses: actions/setup-node@v4
 #       with:
 #         node-version: latest
 #     - run: install -g appdmg
-
-
 #     # Important! Cleanup: remove the certificate and provisioning profile from the runner!
 #     - name: Clean up keychain and provisioning profile
 #       if: ${{ always() }}
