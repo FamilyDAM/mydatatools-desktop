@@ -15,7 +15,7 @@ jobs:
      - run: flutter config --enable-macos-desktop
      - run: flutter --version    
      - run: flutter pub get
-     - run: flutter build macos
+     - run: flutter build macos --no-tree-shake-icons 
 
 
 #  build:
