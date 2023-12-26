@@ -6,6 +6,9 @@ on:
 jobs:
   build-macos:
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ./client
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
@@ -15,10 +18,8 @@ jobs:
       - run: flutter config --enable-macos-desktop
       - run: flutter --version    
       - name: install flutter libs
-        working-directory: ./client
         run: flutter pub get
       - name: build macos
-        working-directory: ./client
         run: flutter build macos --no-tree-shake-icons 
       
 #Build Binary Installations
