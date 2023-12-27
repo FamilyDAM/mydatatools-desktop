@@ -28,8 +28,9 @@ RUN install-packages \
 # apt-get install --no-install-recommends -y libsecret-1-0 git && \
 # apt-get install -y libjsoncpp-dev
 
-# RUN apt-get install libsecret-1-dev
-# RUN apt-get install -y libjsoncpp
+RUN apt-get update -y
+RUN apt-get install -y libsecret-1-dev
+RUN apt-get install -y libjsoncpp-dev
 
 # Make some changes for our vnc client and flutter chrome
 # RUN sed -i 's|resize=scale|resize=remote|g' /opt/novnc/index.html \
