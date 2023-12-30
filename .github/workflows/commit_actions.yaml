@@ -3,6 +3,7 @@ run-name: ${{ github.actor }} is building and releasing (to github) the mac,wind
 on:
   push:
     branches: [ "develop" ]
+    
 jobs:
   build-and-release-macos:
     runs-on: macos-latest
