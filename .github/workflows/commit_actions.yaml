@@ -1,5 +1,6 @@
 name: commit_actions
 run-name: ${{ github.actor }} is building and releasing (to github) the mac,windows,and linux versions of the desktop
+
 on:
   push:
     branches: [ "develop" ]
