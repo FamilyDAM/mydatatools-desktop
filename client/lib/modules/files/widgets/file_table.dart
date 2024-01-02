@@ -157,7 +157,7 @@ class _FileTable extends State<FileTable> {
                           message: f.dateCreated.toLocal().toString(),
                           child: Text(
                               moment.fromNowPrecise(
-                                form: UnitStringForm.short,
+                                form: Abbreviation.full,
                                 includeWeeks: true,
                               ),
                               overflow: TextOverflow.clip))),

@@ -123,7 +123,7 @@ class GridData extends DataTableSource {
                       message: email.date.toLocal().toString(),
                       child: Text(
                           moment.fromNow(
-                            form: UnitStringForm.short,
+                            form: Abbreviation.full,
                           ),
                           overflow: TextOverflow.clip))),
               onTap: () => print('tap date')),

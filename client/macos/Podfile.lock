@@ -23,7 +23,7 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - realm (1.4.0):
+  - realm (1.6.1):
     - FlutterMacOS
   - url_launcher_macos (0.0.1):
     - FlutterMacOS
@@ -76,7 +76,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
   GTMSessionFetcher: 41b9ef0b4c08a6db4b7eb51a21ae5183ec99a2c8
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  realm: 20ba0516509ca717474ddd8212ee4d3171428831
+  realm: 489ecb16ae9ce03f33218b7bdebbcc2c28d6d378
   url_launcher_macos: d2691c7dd33ed713bf3544850a623080ec693d95
   window_size: 339dafa0b27a95a62a843042038fa6c3c48de195
   window_to_front: 4cdc24ddd8461ad1a55fa06286d6a79d8b29e8d8

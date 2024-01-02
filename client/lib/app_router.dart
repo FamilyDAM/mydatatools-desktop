@@ -37,7 +37,7 @@ class AppRouter {
           initialLocation: '/',
           debugLogDiagnostics: true,
           redirect: (BuildContext context, GoRouterState state) async {
-            if (state.location == '/setup') return null;
+            if (state.uri.toString() == '/setup') return null;
 
             //check app startup initialization
             if (!RealmRepository.isInitialized) {
@@ -55,10 +55,10 @@ class AppRouter {
               return '/login';
             }
 
-            if (state.location == '/login') {
+            if (state.uri.toString() == '/login') {
               return '/';
             } else {
-              return state.location;
+              return state.uri.toString();
             }
           },
           routes: <ShellRoute>[
