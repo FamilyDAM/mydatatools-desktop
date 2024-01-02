@@ -1,0 +1,45 @@
+{
+  "name": "realm",
+  "version": "1.4.0",
+  "summary": "The official Realm SDK for Flutter",
+  "description": "Realm is a mobile database - an alternative to SQLite and key-value stores.",
+  "homepage": "https://realm.io",
+  "license": {
+    "file": "../LICENSE"
+  },
+  "authors": {
+    "Realm": "help@realm.io"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "dependencies": {
+    "FlutterMacOS": [
+
+    ]
+  },
+  "platforms": {
+    "osx": "10.11"
+  },
+  "compiler_flags": "-DBUNDLE_ID='\"client\"'",
+  "pod_target_xcconfig": {
+    "DEFINES_MODULE": "YES"
+  },
+  "swift_versions": "5.0",
+  "vendored_libraries": "librealm_dart.dylib",
+  "prepare_command": "touch /Users/mikenimer/Development/projects/mydatatools-desktop/client/macos/Flutter/ephemeral/.symlinks/plugins/realm/macos/librealm_dart.dylib",
+  "script_phases": [
+    {
+      "name": "Download Realm Flutter macOS Binaries",
+      "script": "source \"$PROJECT_DIR/../Flutter/ephemeral/flutter_export_environment.sh\" && cd \"$FLUTTER_APPLICATION_PATH\" && \"$FLUTTER_ROOT/bin/dart\" run realm install --target-os-type macos --flavor flutter",
+      "execution_position": "before_headers"
+    },
+    {
+      "name": "Report Metrics",
+      "script": "source \"$PROJECT_DIR/../Flutter/ephemeral/flutter_export_environment.sh\" && cd \"$FLUTTER_APPLICATION_PATH\" && \"$FLUTTER_ROOT/bin/dart\" run realm metrics --flutter-root \"$FLUTTER_ROOT\" --target-os-type macos --target-os-version \"$MACOSX_DEPLOYMENT_TARGET\"",
+      "execution_position": "before_compile"
+    }
+  ],
+  "swift_version": "5.0"
+}

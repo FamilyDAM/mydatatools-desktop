@@ -1,0 +1,6 @@
+framework module window_size {
+  umbrella header "window_size-umbrella.h"
+
+  export *
+  module * { export * }
+}
