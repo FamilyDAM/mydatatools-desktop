@@ -6,6 +6,7 @@ part of 'app_models.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// ignore_for_file: type=lint
 class Apps extends _Apps with RealmEntity, RealmObjectBase, RealmObject {
   static var _defaultsSet = false;
 

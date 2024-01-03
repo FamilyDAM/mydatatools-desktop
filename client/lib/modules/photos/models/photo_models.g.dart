@@ -6,6 +6,7 @@ part of 'photo_models.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// ignore_for_file: type=lint
 class Album extends _Album with RealmEntity, RealmObjectBase, RealmObject {
   Album(
     ObjectId id,

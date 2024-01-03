@@ -6,6 +6,7 @@ part of 'collection_model.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// ignore_for_file: type=lint
 class Collection extends _Collection
     with RealmEntity, RealmObjectBase, RealmObject {
   static var _defaultsSet = false;

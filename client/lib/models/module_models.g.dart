@@ -6,6 +6,7 @@ part of 'module_models.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// ignore_for_file: type=lint
 class Folder extends _Folder with RealmEntity, RealmObjectBase, RealmObject {
   static var _defaultsSet = false;
 
