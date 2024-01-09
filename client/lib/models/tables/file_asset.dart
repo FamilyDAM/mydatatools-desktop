@@ -4,6 +4,6 @@ class FileAsset {
   late String path;
   late String parent;
   late DateTime dateCreated;
-  late DateTime lastModified;
+  late DateTime dateLastModified;
   late String collectionId;
 }

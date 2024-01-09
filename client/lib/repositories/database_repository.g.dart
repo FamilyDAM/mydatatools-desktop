@@ -928,26 +928,26 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
       const VerificationMeta('subject');
   @override
   late final GeneratedColumn<String> subject = GeneratedColumn<String>(
-      'subject', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'subject', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _snippetMeta =
       const VerificationMeta('snippet');
   @override
   late final GeneratedColumn<String> snippet = GeneratedColumn<String>(
-      'snippet', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'snippet', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _htmlBodyMeta =
       const VerificationMeta('htmlBody');
   @override
   late final GeneratedColumn<String> htmlBody = GeneratedColumn<String>(
-      'html_body', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'html_body', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _plainBodyMeta =
       const VerificationMeta('plainBody');
   @override
   late final GeneratedColumn<String> plainBody = GeneratedColumn<String>(
-      'plain_body', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'plain_body', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _headersMeta =
       const VerificationMeta('headers');
   @override
@@ -1015,26 +1015,18 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
     if (data.containsKey('subject')) {
       context.handle(_subjectMeta,
           subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta));
-    } else if (isInserting) {
-      context.missing(_subjectMeta);
     }
     if (data.containsKey('snippet')) {
       context.handle(_snippetMeta,
           snippet.isAcceptableOrUnknown(data['snippet']!, _snippetMeta));
-    } else if (isInserting) {
-      context.missing(_snippetMeta);
     }
     if (data.containsKey('html_body')) {
       context.handle(_htmlBodyMeta,
           htmlBody.isAcceptableOrUnknown(data['html_body']!, _htmlBodyMeta));
-    } else if (isInserting) {
-      context.missing(_htmlBodyMeta);
     }
     if (data.containsKey('plain_body')) {
       context.handle(_plainBodyMeta,
           plainBody.isAcceptableOrUnknown(data['plain_body']!, _plainBodyMeta));
-    } else if (isInserting) {
-      context.missing(_plainBodyMeta);
     }
     if (data.containsKey('headers')) {
       context.handle(_headersMeta,
@@ -1064,13 +1056,13 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
       from: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}from'])!,
       subject: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}subject'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}subject']),
       snippet: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}snippet'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}snippet']),
       htmlBody: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}html_body'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}html_body']),
       plainBody: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}plain_body'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}plain_body']),
       headers: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}headers'])!,
       isDeleted: attachedDatabase.typeMapping
@@ -1089,10 +1081,10 @@ class EmailsCompanion extends UpdateCompanion<Email> {
   final Value<String> collectionId;
   final Value<DateTime> date;
   final Value<String> from;
-  final Value<String> subject;
-  final Value<String> snippet;
-  final Value<String> htmlBody;
-  final Value<String> plainBody;
+  final Value<String?> subject;
+  final Value<String?> snippet;
+  final Value<String?> htmlBody;
+  final Value<String?> plainBody;
   final Value<String> headers;
   final Value<bool> isDeleted;
   final Value<int> rowid;
@@ -1114,10 +1106,10 @@ class EmailsCompanion extends UpdateCompanion<Email> {
     required String collectionId,
     required DateTime date,
     required String from,
-    required String subject,
-    required String snippet,
-    required String htmlBody,
-    required String plainBody,
+    this.subject = const Value.absent(),
+    this.snippet = const Value.absent(),
+    this.htmlBody = const Value.absent(),
+    this.plainBody = const Value.absent(),
     required String headers,
     this.isDeleted = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1125,10 +1117,6 @@ class EmailsCompanion extends UpdateCompanion<Email> {
         collectionId = Value(collectionId),
         date = Value(date),
         from = Value(from),
-        subject = Value(subject),
-        snippet = Value(snippet),
-        htmlBody = Value(htmlBody),
-        plainBody = Value(plainBody),
         headers = Value(headers);
   static Insertable<Email> custom({
     Expression<String>? id,
@@ -1163,10 +1151,10 @@ class EmailsCompanion extends UpdateCompanion<Email> {
       Value<String>? collectionId,
       Value<DateTime>? date,
       Value<String>? from,
-      Value<String>? subject,
-      Value<String>? snippet,
-      Value<String>? htmlBody,
-      Value<String>? plainBody,
+      Value<String?>? subject,
+      Value<String?>? snippet,
+      Value<String?>? htmlBody,
+      Value<String?>? plainBody,
       Value<String>? headers,
       Value<bool>? isDeleted,
       Value<int>? rowid}) {
@@ -1274,12 +1262,12 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
   late final GeneratedColumn<DateTime> dateCreated = GeneratedColumn<DateTime>(
       'date_created', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _lastModifiedMeta =
-      const VerificationMeta('lastModified');
+  static const VerificationMeta _dateLastModifiedMeta =
+      const VerificationMeta('dateLastModified');
   @override
-  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
-      'last_modified', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  late final GeneratedColumn<DateTime> dateLastModified =
+      GeneratedColumn<DateTime>('date_last_modified', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
   static const VerificationMeta _collectionIdMeta =
       const VerificationMeta('collectionId');
   @override
@@ -1299,7 +1287,7 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
         path,
         parent,
         dateCreated,
-        lastModified,
+        dateLastModified,
         collectionId,
         contentType
       ];
@@ -1344,13 +1332,13 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
     } else if (isInserting) {
       context.missing(_dateCreatedMeta);
     }
-    if (data.containsKey('last_modified')) {
+    if (data.containsKey('date_last_modified')) {
       context.handle(
-          _lastModifiedMeta,
-          lastModified.isAcceptableOrUnknown(
-              data['last_modified']!, _lastModifiedMeta));
+          _dateLastModifiedMeta,
+          dateLastModified.isAcceptableOrUnknown(
+              data['date_last_modified']!, _dateLastModifiedMeta));
     } else if (isInserting) {
-      context.missing(_lastModifiedMeta);
+      context.missing(_dateLastModifiedMeta);
     }
     if (data.containsKey('collection_id')) {
       context.handle(
@@ -1387,8 +1375,8 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
           .read(DriftSqlType.string, data['${effectivePrefix}parent'])!,
       dateCreated: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date_created'])!,
-      lastModified: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}last_modified'])!,
+      dateLastModified: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}date_last_modified'])!,
       collectionId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}collection_id'])!,
       contentType: attachedDatabase.typeMapping
@@ -1408,7 +1396,7 @@ class FilesCompanion extends UpdateCompanion<File> {
   final Value<String> path;
   final Value<String> parent;
   final Value<DateTime> dateCreated;
-  final Value<DateTime> lastModified;
+  final Value<DateTime> dateLastModified;
   final Value<String> collectionId;
   final Value<String> contentType;
   final Value<int> rowid;
@@ -1418,7 +1406,7 @@ class FilesCompanion extends UpdateCompanion<File> {
     this.path = const Value.absent(),
     this.parent = const Value.absent(),
     this.dateCreated = const Value.absent(),
-    this.lastModified = const Value.absent(),
+    this.dateLastModified = const Value.absent(),
     this.collectionId = const Value.absent(),
     this.contentType = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1429,7 +1417,7 @@ class FilesCompanion extends UpdateCompanion<File> {
     required String path,
     required String parent,
     required DateTime dateCreated,
-    required DateTime lastModified,
+    required DateTime dateLastModified,
     required String collectionId,
     required String contentType,
     this.rowid = const Value.absent(),
@@ -1438,7 +1426,7 @@ class FilesCompanion extends UpdateCompanion<File> {
         path = Value(path),
         parent = Value(parent),
         dateCreated = Value(dateCreated),
-        lastModified = Value(lastModified),
+        dateLastModified = Value(dateLastModified),
         collectionId = Value(collectionId),
         contentType = Value(contentType);
   static Insertable<File> custom({
@@ -1447,7 +1435,7 @@ class FilesCompanion extends UpdateCompanion<File> {
     Expression<String>? path,
     Expression<String>? parent,
     Expression<DateTime>? dateCreated,
-    Expression<DateTime>? lastModified,
+    Expression<DateTime>? dateLastModified,
     Expression<String>? collectionId,
     Expression<String>? contentType,
     Expression<int>? rowid,
@@ -1458,7 +1446,7 @@ class FilesCompanion extends UpdateCompanion<File> {
       if (path != null) 'path': path,
       if (parent != null) 'parent': parent,
       if (dateCreated != null) 'date_created': dateCreated,
-      if (lastModified != null) 'last_modified': lastModified,
+      if (dateLastModified != null) 'date_last_modified': dateLastModified,
       if (collectionId != null) 'collection_id': collectionId,
       if (contentType != null) 'content_type': contentType,
       if (rowid != null) 'rowid': rowid,
@@ -1471,7 +1459,7 @@ class FilesCompanion extends UpdateCompanion<File> {
       Value<String>? path,
       Value<String>? parent,
       Value<DateTime>? dateCreated,
-      Value<DateTime>? lastModified,
+      Value<DateTime>? dateLastModified,
       Value<String>? collectionId,
       Value<String>? contentType,
       Value<int>? rowid}) {
@@ -1481,7 +1469,7 @@ class FilesCompanion extends UpdateCompanion<File> {
       path: path ?? this.path,
       parent: parent ?? this.parent,
       dateCreated: dateCreated ?? this.dateCreated,
-      lastModified: lastModified ?? this.lastModified,
+      dateLastModified: dateLastModified ?? this.dateLastModified,
       collectionId: collectionId ?? this.collectionId,
       contentType: contentType ?? this.contentType,
       rowid: rowid ?? this.rowid,
@@ -1506,8 +1494,8 @@ class FilesCompanion extends UpdateCompanion<File> {
     if (dateCreated.present) {
       map['date_created'] = Variable<DateTime>(dateCreated.value);
     }
-    if (lastModified.present) {
-      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    if (dateLastModified.present) {
+      map['date_last_modified'] = Variable<DateTime>(dateLastModified.value);
     }
     if (collectionId.present) {
       map['collection_id'] = Variable<String>(collectionId.value);
@@ -1529,7 +1517,7 @@ class FilesCompanion extends UpdateCompanion<File> {
           ..write('path: $path, ')
           ..write('parent: $parent, ')
           ..write('dateCreated: $dateCreated, ')
-          ..write('lastModified: $lastModified, ')
+          ..write('dateLastModified: $dateLastModified, ')
           ..write('collectionId: $collectionId, ')
           ..write('contentType: $contentType, ')
           ..write('rowid: $rowid')
@@ -1569,12 +1557,12 @@ class $FoldersTable extends Folders with TableInfo<$FoldersTable, Folder> {
   late final GeneratedColumn<DateTime> dateCreated = GeneratedColumn<DateTime>(
       'date_created', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _lastModifiedMeta =
-      const VerificationMeta('lastModified');
+  static const VerificationMeta _dateLastModifiedMeta =
+      const VerificationMeta('dateLastModified');
   @override
-  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
-      'last_modified', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  late final GeneratedColumn<DateTime> dateLastModified =
+      GeneratedColumn<DateTime>('date_last_modified', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
   static const VerificationMeta _collectionIdMeta =
       const VerificationMeta('collectionId');
   @override
@@ -1583,7 +1571,7 @@ class $FoldersTable extends Folders with TableInfo<$FoldersTable, Folder> {
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, path, parent, dateCreated, lastModified, collectionId];
+      [id, name, path, parent, dateCreated, dateLastModified, collectionId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1625,13 +1613,13 @@ class $FoldersTable extends Folders with TableInfo<$FoldersTable, Folder> {
     } else if (isInserting) {
       context.missing(_dateCreatedMeta);
     }
-    if (data.containsKey('last_modified')) {
+    if (data.containsKey('date_last_modified')) {
       context.handle(
-          _lastModifiedMeta,
-          lastModified.isAcceptableOrUnknown(
-              data['last_modified']!, _lastModifiedMeta));
+          _dateLastModifiedMeta,
+          dateLastModified.isAcceptableOrUnknown(
+              data['date_last_modified']!, _dateLastModifiedMeta));
     } else if (isInserting) {
-      context.missing(_lastModifiedMeta);
+      context.missing(_dateLastModifiedMeta);
     }
     if (data.containsKey('collection_id')) {
       context.handle(
@@ -1660,8 +1648,8 @@ class $FoldersTable extends Folders with TableInfo<$FoldersTable, Folder> {
           .read(DriftSqlType.string, data['${effectivePrefix}parent'])!,
       dateCreated: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date_created'])!,
-      lastModified: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}last_modified'])!,
+      dateLastModified: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}date_last_modified'])!,
       collectionId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}collection_id'])!,
     );
@@ -1679,7 +1667,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
   final Value<String> path;
   final Value<String> parent;
   final Value<DateTime> dateCreated;
-  final Value<DateTime> lastModified;
+  final Value<DateTime> dateLastModified;
   final Value<String> collectionId;
   final Value<int> rowid;
   const FoldersCompanion({
@@ -1688,7 +1676,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
     this.path = const Value.absent(),
     this.parent = const Value.absent(),
     this.dateCreated = const Value.absent(),
-    this.lastModified = const Value.absent(),
+    this.dateLastModified = const Value.absent(),
     this.collectionId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1698,7 +1686,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
     required String path,
     required String parent,
     required DateTime dateCreated,
-    required DateTime lastModified,
+    required DateTime dateLastModified,
     required String collectionId,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -1706,7 +1694,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
         path = Value(path),
         parent = Value(parent),
         dateCreated = Value(dateCreated),
-        lastModified = Value(lastModified),
+        dateLastModified = Value(dateLastModified),
         collectionId = Value(collectionId);
   static Insertable<Folder> custom({
     Expression<String>? id,
@@ -1714,7 +1702,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
     Expression<String>? path,
     Expression<String>? parent,
     Expression<DateTime>? dateCreated,
-    Expression<DateTime>? lastModified,
+    Expression<DateTime>? dateLastModified,
     Expression<String>? collectionId,
     Expression<int>? rowid,
   }) {
@@ -1724,7 +1712,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
       if (path != null) 'path': path,
       if (parent != null) 'parent': parent,
       if (dateCreated != null) 'date_created': dateCreated,
-      if (lastModified != null) 'last_modified': lastModified,
+      if (dateLastModified != null) 'date_last_modified': dateLastModified,
       if (collectionId != null) 'collection_id': collectionId,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1736,7 +1724,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
       Value<String>? path,
       Value<String>? parent,
       Value<DateTime>? dateCreated,
-      Value<DateTime>? lastModified,
+      Value<DateTime>? dateLastModified,
       Value<String>? collectionId,
       Value<int>? rowid}) {
     return FoldersCompanion(
@@ -1745,7 +1733,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
       path: path ?? this.path,
       parent: parent ?? this.parent,
       dateCreated: dateCreated ?? this.dateCreated,
-      lastModified: lastModified ?? this.lastModified,
+      dateLastModified: dateLastModified ?? this.dateLastModified,
       collectionId: collectionId ?? this.collectionId,
       rowid: rowid ?? this.rowid,
     );
@@ -1769,8 +1757,8 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
     if (dateCreated.present) {
       map['date_created'] = Variable<DateTime>(dateCreated.value);
     }
-    if (lastModified.present) {
-      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    if (dateLastModified.present) {
+      map['date_last_modified'] = Variable<DateTime>(dateLastModified.value);
     }
     if (collectionId.present) {
       map['collection_id'] = Variable<String>(collectionId.value);
@@ -1789,7 +1777,7 @@ class FoldersCompanion extends UpdateCompanion<Folder> {
           ..write('path: $path, ')
           ..write('parent: $parent, ')
           ..write('dateCreated: $dateCreated, ')
-          ..write('lastModified: $lastModified, ')
+          ..write('dateLastModified: $dateLastModified, ')
           ..write('collectionId: $collectionId, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -1823,16 +1811,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       Index('file_path_idx', 'CREATE INDEX file_path_idx ON files (path)');
   late final Index fileParentIdx = Index(
       'file_parent_idx', 'CREATE INDEX file_parent_idx ON files (parent)');
-  late final Index fileCollectionidIdx = Index('file_collectionid_idx',
-      'CREATE INDEX file_collectionid_idx ON files (collection_id)');
+  late final Index fileCollectionIdIdx = Index('file_collection_id_idx',
+      'CREATE INDEX file_collection_id_idx ON files (collection_id)');
   late final Index fileContenttypeIdx = Index('file_contenttype_idx',
       'CREATE INDEX file_contenttype_idx ON files (content_type)');
   late final Index folderPathIdx = Index(
       'folder_path_idx', 'CREATE INDEX folder_path_idx ON folders (path)');
   late final Index folderParentIdx = Index('folder_parent_idx',
       'CREATE INDEX folder_parent_idx ON folders (parent)');
-  late final Index folderCollectionidIdx = Index('folder_collectionid_idx',
-      'CREATE INDEX folder_collectionid_idx ON folders (collection_id)');
+  late final Index folderCollectionIdIdx = Index('folder_collection_id_idx',
+      'CREATE INDEX folder_collection_id_idx ON folders (collection_id)');
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1853,11 +1841,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         emailFromIdx,
         filePathIdx,
         fileParentIdx,
-        fileCollectionidIdx,
+        fileCollectionIdIdx,
         fileContenttypeIdx,
         folderPathIdx,
         folderParentIdx,
-        folderCollectionidIdx
+        folderCollectionIdIdx
       ];
 }
 

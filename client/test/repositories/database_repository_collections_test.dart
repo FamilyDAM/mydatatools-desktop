@@ -164,7 +164,7 @@ void main() {
       await db.delete(db.collections).delete(collection);
     });
 
-    test("Insert multiple AppUsers", () async {
+    test("Insert multiple Collections", () async {
       m.Collection collection1 = m.Collection(
           id: Uuid.v4().toString(),
           name: "Files",
