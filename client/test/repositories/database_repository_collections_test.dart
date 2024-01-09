@@ -59,7 +59,13 @@ void main() {
 
     test("Delete Collection", () async {
       m.Collection collection = m.Collection(
-          Uuid.v4().toString(), "Files", "/files", "file", "", "", null, null, null, null, null, null, null, true);
+          id: Uuid.v4().toString(),
+          name: "Files",
+          path: "/files",
+          type: "file",
+          scanner: "",
+          scanStatus: "",
+          needsReAuth: true);
       var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection);
 
@@ -74,7 +80,13 @@ void main() {
 
     test("check all properties are saved", () async {
       m.Collection collection = m.Collection(
-          Uuid.v4().toString(), "Files", "/files", "file", "", "", null, null, null, null, null, null, null, true);
+          id: Uuid.v4().toString(),
+          name: "Files",
+          path: "/files",
+          type: "file",
+          scanner: "",
+          scanStatus: "",
+          needsReAuth: true);
 
       var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection);
@@ -101,8 +113,14 @@ void main() {
     });
 
     test("update nullable props in db", () async {
-      m.Collection collection = m.Collection(Uuid.v4().toString(), "Files", "/files", "file", "scanner", "scanStatus",
-          null, null, null, null, null, null, null, true);
+      m.Collection collection = m.Collection(
+          id: Uuid.v4().toString(),
+          name: "Files",
+          path: "/files",
+          type: "file",
+          scanner: "",
+          scanStatus: "",
+          needsReAuth: true);
 
       var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection);
@@ -148,11 +166,29 @@ void main() {
 
     test("Insert multiple AppUsers", () async {
       m.Collection collection1 = m.Collection(
-          Uuid.v4().toString(), "Files", "/files", "file", "", "", null, null, null, null, null, null, null, true);
+          id: Uuid.v4().toString(),
+          name: "Files",
+          path: "/files",
+          type: "file",
+          scanner: "",
+          scanStatus: "",
+          needsReAuth: true);
       m.Collection collection2 = m.Collection(
-          Uuid.v4().toString(), "Files", "/files", "file", "", "", null, null, null, null, null, null, null, true);
+          id: Uuid.v4().toString(),
+          name: "Files",
+          path: "/files",
+          type: "file",
+          scanner: "",
+          scanStatus: "",
+          needsReAuth: true);
       m.Collection collection3 = m.Collection(
-          Uuid.v4().toString(), "Files", "/files", "file", "", "", null, null, null, null, null, null, null, true);
+          id: Uuid.v4().toString(),
+          name: "Files",
+          path: "/files",
+          type: "file",
+          scanner: "",
+          scanStatus: "",
+          needsReAuth: true);
 
       var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection1);

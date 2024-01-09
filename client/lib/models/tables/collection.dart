@@ -50,12 +50,12 @@ class Collection implements Insertable<Collection> {
   String? statusMessage;
 
   Collection(
-      this.id,
-      this.name,
-      this.path,
-      this.type,
-      this.scanner,
-      this.scanStatus,
+      {required this.id,
+      required this.name,
+      required this.path,
+      required this.type,
+      required this.scanner,
+      required this.scanStatus,
       this.oauthService,
       this.accessToken,
       this.refreshToken,
@@ -63,7 +63,7 @@ class Collection implements Insertable<Collection> {
       this.userId,
       this.expiration,
       this.lastScanDate,
-      this.needsReAuth);
+      required this.needsReAuth});
 
   Collection.fromDb(
       {required this.id,
