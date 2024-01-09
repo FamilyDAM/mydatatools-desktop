@@ -1,3 +1,6 @@
+#project files & folders
+data/*.sqllite
+
 # Miscellaneous
 *.class
 *.log

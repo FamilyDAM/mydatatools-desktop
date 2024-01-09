@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class EmailPage extends StatefulWidget {
-  const EmailPage({Key? key}) : super(key: key);
+  const EmailPage({super.key});
 
   static PublishSubject selectedCollection = PublishSubject();
 

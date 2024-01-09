@@ -2,7 +2,7 @@ import 'package:client/models/module_models.dart';
 import 'package:flutter/material.dart';
 
 class EmailDetails extends StatefulWidget {
-  const EmailDetails({Key? key, required this.email}) : super(key: key);
+  const EmailDetails({super.key, required this.email});
 
   final Email email;
 

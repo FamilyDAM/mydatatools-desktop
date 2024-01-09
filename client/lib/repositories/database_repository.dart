@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'dart:io' as io;
 import 'package:client/app_logger.dart';
 import 'package:client/models/tables/app_user.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/email.dart';
+import 'package:client/models/tables/file.dart';
+import 'package:client/models/tables/folder.dart';
 import 'package:path/path.dart' as p;
 import 'package:drift/native.dart';
 import 'package:drift/drift.dart';
@@ -24,7 +28,7 @@ class DatabaseRepository {
   AppDatabase? get database {
     if (_database != null) return _database;
     // instantiate the db the first time it is accessed
-    _initDatabase(DatabaseRepository.databaseName!);
+    _initDatabase(DatabaseRepository.databasePath!, DatabaseRepository.databaseName!);
     return _database;
   }
 
@@ -46,11 +50,13 @@ class DatabaseRepository {
     //use last used name if null, if this is the first time and it's null use the default name defined as an App Constant
     DatabaseRepository.databasePath = databasePath ?? DatabaseRepository.databasePath ?? ".";
     DatabaseRepository.databaseName = databaseName ?? DatabaseRepository.databaseName ?? AppConstants.configFileName;
+
+    //db will be initialized on first access, from getter
   }
 
   // this opens the database (and creates it if it doesn't exist)
-  _initDatabase(String name) {
-    database = AppDatabase(name);
+  _initDatabase(String path, String name) {
+    database = AppDatabase(path, name);
   }
 
   // All of the rows are returned as a list of maps, where each map is
@@ -63,15 +69,39 @@ class DatabaseRepository {
   }
 }
 
-@DriftDatabase(tables: [App, AppUser])
+@DriftDatabase(tables: [Apps, AppUsers, Collections, Emails, Files, Folders])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase(String name) : super(_openConnection(name));
+  AppDatabase(String path, String name) : super(_openConnection(path, name));
+
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        print("Creating all Tables");
+        await m.createAll();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from < 2) {
+          print("Upgrade tables to v2");
+          // we added the dueDate property in the change from version 1 to
+          // version 2
+          //await m.addColumn(todos, todos.dueDate);
+        }
+        if (from < 3) {
+          print("Upgrade tables to v3");
+          // we added the priority property in the change from version 1 or 2
+          // to version 3
+          //await m.addColumn(todos, todos.priority);
+        }
+      },
+    );
+  }
 }
 
-LazyDatabase _openConnection(String name) {
-  String path = ".";
+LazyDatabase _openConnection(String path, String name) {
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
     print("Initialize Database");

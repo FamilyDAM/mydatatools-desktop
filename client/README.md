@@ -20,11 +20,12 @@ All stored locally on your machine. No ads. No tracking. No selling your data. J
 * Regenerate Models 
 ```bash
 flutter pub run realm generate
+dart run build_runner build
 ```
 
 * Build macos 
 ```bash
-flutter build macos --no-tree-shake-icons 
+flutter build macos --no-tree-shake-icons --release
 ```
 
 * Create DMG  

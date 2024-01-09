@@ -1,13 +1,48 @@
+import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
+import 'package:realm/realm.dart';
 
 part 'app_user.g.dart';
 
-class AppUser extends Table {
-  TextColumn get id => text().unique()();
+@UseRowClass(AppUser, constructor: 'fromDb')
+class AppUsers extends Table {
+  TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get email => text()();
   TextColumn get password => text()();
   TextColumn get localStoragePath => text()();
-  String get privateKey => "";
-  String get publicKey => "";
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class AppUser implements Insertable<AppUser> {
+  late String id;
+  late String name;
+  late String email;
+  late String password;
+  late String localStoragePath;
+  //not in DB
+  String? privateKey;
+  String? publicKey;
+
+  AppUser(this.id, this.name, this.email, this.password, this.localStoragePath, this.privateKey, this.publicKey);
+
+  AppUser.fromDb(
+      {required this.id,
+      required this.name,
+      required this.email,
+      required this.password,
+      required this.localStoragePath});
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return AppUsersCompanion(
+            id: Value(id),
+            name: Value(name),
+            email: Value(email),
+            password: Value(password),
+            localStoragePath: Value(localStoragePath))
+        .toColumns(nullToAbsent);
+  }
 }

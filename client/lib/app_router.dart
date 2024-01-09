@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:client/app_constants.dart';
-import 'package:client/models/app_models.dart';
+import 'package:client/models/app_models.dart' as m;
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/modules/email/pages/new_email_page.dart';
 import 'package:client/modules/email/widgets/email_drawer.dart';
@@ -53,7 +53,7 @@ class AppRouter {
             //todo: add logic to show splash screen
 
             //check if user is logged in
-            AppUser? user = GetUserService.instance.sink.valueOrNull;
+            m.AppUser? user = GetUserService.instance.sink.valueOrNull;
             if (user == null) {
               return '/login';
             }
@@ -189,7 +189,7 @@ class AppRouter {
         print("Schema Version=${db.database!.schemaVersion}");
 
         //last check, do we have any users?
-        List<AppUser> users = await GetUsersService.instance.invoke(GetUsersServiceCommand());
+        List<m.AppUser> users = await GetUsersService.instance.invoke(GetUsersServiceCommand());
         if (users.isEmpty) {
           return true; //Needs Setup
         }
