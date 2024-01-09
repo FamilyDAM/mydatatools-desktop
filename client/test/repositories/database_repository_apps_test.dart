@@ -4,9 +4,10 @@ import 'package:client/models/tables/app.dart' as m;
 import 'package:client/repositories/database_repository.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/isolate.dart';
-import 'package:flutter/servicest/flutter_test.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:realm/realm.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,8 @@ void main() {
     setUpAll(() async {
       //https://github.com/flutter/flutter/issues/10912#issuecomment-587403632
       TestWidgetsFlutterBinding.ensureInitialized();
-      const MethodChannel channel = MethodChannel('plugins.flutter.io/path_provider');
+      const MethodChannel channel =
+          MethodChannel('plugins.flutter.io/path_provider');
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
         return ".";
       });
@@ -55,7 +57,8 @@ void main() {
     });
 
     test("check all properties are saved", () async {
-      m.App app = m.App(Uuid.v4().toString(), "test app #1", "test_app_1", "files", 1, null, "/app/1");
+      m.App app = m.App(Uuid.v4().toString(), "test app #1", "test_app_1",
+          "files", 1, null, "/app/1");
       var db = databaseRepository.database!;
       await db.into(db.apps).insert(app);
 
@@ -74,11 +77,14 @@ void main() {
     });
 
     test("Get By App ID", () async {
-      m.App app = m.App(Uuid.v4().toString(), "test app #1", "test_app_1", "files", 1, null, "/app/1");
+      m.App app = m.App(Uuid.v4().toString(), "test app #1", "test_app_1",
+          "files", 1, null, "/app/1");
       var db = databaseRepository.database!;
       await db.into(db.apps).insert(app);
 
-      m.App dbApp = await (db.select(db.apps)..where((a) => a.id.equals(app.id))).getSingle();
+      m.App dbApp = await (db.select(db.apps)
+            ..where((a) => a.id.equals(app.id)))
+          .getSingle();
       expect(dbApp, isNotNull);
       expect(dbApp.id, equals(app.id));
 
@@ -86,9 +92,12 @@ void main() {
     });
 
     test("Insert multiple Apps", () async {
-      m.App app1 = m.App(Uuid.v4().toString(), "test app #1", "test_app_1", "files", 1, null, "/app/1");
-      m.App app2 = m.App(Uuid.v4().toString(), "test app #2", "test_app_2", "files", 2, null, "/app/2");
-      m.App app3 = m.App(Uuid.v4().toString(), "test app #3", "test_app_3", "files", 3, null, "/app/3");
+      m.App app1 = m.App(Uuid.v4().toString(), "test app #1", "test_app_1",
+          "files", 1, null, "/app/1");
+      m.App app2 = m.App(Uuid.v4().toString(), "test app #2", "test_app_2",
+          "files", 2, null, "/app/2");
+      m.App app3 = m.App(Uuid.v4().toString(), "test app #3", "test_app_3",
+          "files", 3, null, "/app/3");
       var db = databaseRepository.database!;
       await db.into(db.apps).insert(app1);
       await db.into(db.apps).insert(app2);
@@ -104,8 +113,10 @@ void main() {
     });
 
     test("Check Unique Constraint in Apps", () async {
-      m.App app1 = m.App(Uuid.v4().toString(), "test app #1", "test_app_1", "files", 1, null, "/app/1");
-      m.App app2 = m.App(Uuid.v4().toString(), "test app #1", "test_app_1", "files", 1, null, "/app/1");
+      m.App app1 = m.App(Uuid.v4().toString(), "test app #1", "test_app_1",
+          "files", 1, null, "/app/1");
+      m.App app2 = m.App(Uuid.v4().toString(), "test app #1", "test_app_1",
+          "files", 1, null, "/app/1");
       var db = databaseRepository.database!;
 
       expect(() async {
