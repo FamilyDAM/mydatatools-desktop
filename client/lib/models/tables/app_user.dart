@@ -1,6 +1,5 @@
 import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
-import 'package:realm/realm.dart';
 
 part 'app_user.g.dart';
 
@@ -26,7 +25,14 @@ class AppUser implements Insertable<AppUser> {
   String? privateKey;
   String? publicKey;
 
-  AppUser(this.id, this.name, this.email, this.password, this.localStoragePath, this.privateKey, this.publicKey);
+  AppUser(
+      {required this.id,
+      required this.name,
+      required this.email,
+      required this.password,
+      required this.localStoragePath,
+      this.privateKey,
+      this.publicKey});
 
   AppUser.fromDb(
       {required this.id,

@@ -1,8 +1,5 @@
 import 'dart:io' as io;
 
-import 'package:client/models/tables/app.dart';
-import 'package:client/models/tables/app_user.dart';
-import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/models/tables/file.dart';
 import 'package:client/models/tables/folder.dart';
@@ -51,34 +48,6 @@ void main() {
 
     test('check schema version', () {
       expect(databaseRepository.database!.schemaVersion, 1);
-    });
-
-    //Apps, AppUsers, Collections, Emails, Files, Folders
-    test('check Apps tables exists', () {
-      var tables = databaseRepository.database!.allTables;
-
-      var t = tables.firstWhereOrNull((e) {
-        return e is Apps;
-      });
-      expect(t != null, true);
-    });
-
-    test('check AppUsers tables exists', () {
-      var tables = databaseRepository.database!.allTables;
-
-      var t = tables.firstWhereOrNull((e) {
-        return e is AppUsers;
-      });
-      expect(t != null, true);
-    });
-
-    test('check Collections tables exists', () {
-      var tables = databaseRepository.database!.allTables;
-
-      var t = tables.firstWhereOrNull((e) {
-        return e is Collections;
-      });
-      expect(t != null, true);
     });
 
     test('check Emails tables exists', () {

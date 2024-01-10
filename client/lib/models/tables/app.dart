@@ -26,7 +26,14 @@ class App implements Insertable<App> {
   int? icon;
   String route = "/";
 
-  App(this.id, this.name, this.slug, this.group, this.order, this.icon, this.route);
+  App(
+      {required this.id,
+      required this.name,
+      required this.slug,
+      required this.group,
+      required this.order,
+      this.icon,
+      required this.route});
 
   App.fromDb(
       {required this.id,
