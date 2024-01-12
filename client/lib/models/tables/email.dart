@@ -21,7 +21,7 @@ class Emails extends Table {
   TextColumn? get htmlBody => text().nullable()();
   TextColumn? get plainBody => text().nullable()();
   //List<String> labels = [];
-  TextColumn? get headers => text()();
+  TextColumn? get headers => text().nullable()();
   //List<File> attachments = [];
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
 
@@ -29,11 +29,11 @@ class Emails extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-class Email {
+class Email implements Insertable<Email> {
   String id;
   String collectionId;
   DateTime date;
-  String? from;
+  String from;
   List<String> to = [];
   List<String>? cc = [];
   String? subject;
@@ -46,7 +46,7 @@ class Email {
   bool isDeleted = false;
 
   //Not in db
-  bool isSelected = false;
+  bool? isSelected = false;
 
   Email(
       {required this.id,
@@ -63,13 +63,13 @@ class Email {
       this.headers,
       this.attachments,
       required this.isDeleted,
-      required this.isSelected});
+      this.isSelected});
 
   Email.fromDb(
       {required this.id,
       required this.collectionId,
       required this.date,
-      this.from,
+      required this.from,
       //required this.to,
       //required this.cc,
       this.subject,
@@ -87,12 +87,12 @@ class Email {
       id: Value(id),
       collectionId: Value(collectionId),
       date: Value(date),
-      from: Value.ofNullable(from),
-      subject: Value.ofNullable(subject),
-      snippet: Value.ofNullable(snippet),
-      htmlBody: Value.ofNullable(htmlBody),
-      plainBody: Value.ofNullable(plainBody),
-      headers: Value.ofNullable(headers),
+      from: Value(from),
+      subject: Value(subject),
+      snippet: Value(snippet),
+      htmlBody: Value(htmlBody),
+      plainBody: Value(plainBody),
+      headers: Value(headers),
       isDeleted: Value(isDeleted),
     ).toColumns(nullToAbsent);
   }

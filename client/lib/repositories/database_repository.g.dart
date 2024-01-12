@@ -952,8 +952,8 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
       const VerificationMeta('headers');
   @override
   late final GeneratedColumn<String> headers = GeneratedColumn<String>(
-      'headers', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'headers', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _isDeletedMeta =
       const VerificationMeta('isDeleted');
   @override
@@ -1031,8 +1031,6 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
     if (data.containsKey('headers')) {
       context.handle(_headersMeta,
           headers.isAcceptableOrUnknown(data['headers']!, _headersMeta));
-    } else if (isInserting) {
-      context.missing(_headersMeta);
     }
     if (data.containsKey('is_deleted')) {
       context.handle(_isDeletedMeta,
@@ -1064,7 +1062,7 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
       plainBody: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}plain_body']),
       headers: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}headers'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}headers']),
       isDeleted: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
     );
@@ -1085,7 +1083,7 @@ class EmailsCompanion extends UpdateCompanion<Email> {
   final Value<String?> snippet;
   final Value<String?> htmlBody;
   final Value<String?> plainBody;
-  final Value<String> headers;
+  final Value<String?> headers;
   final Value<bool> isDeleted;
   final Value<int> rowid;
   const EmailsCompanion({
@@ -1110,14 +1108,13 @@ class EmailsCompanion extends UpdateCompanion<Email> {
     this.snippet = const Value.absent(),
     this.htmlBody = const Value.absent(),
     this.plainBody = const Value.absent(),
-    required String headers,
+    this.headers = const Value.absent(),
     this.isDeleted = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         collectionId = Value(collectionId),
         date = Value(date),
-        from = Value(from),
-        headers = Value(headers);
+        from = Value(from);
   static Insertable<Email> custom({
     Expression<String>? id,
     Expression<String>? collectionId,
@@ -1155,7 +1152,7 @@ class EmailsCompanion extends UpdateCompanion<Email> {
       Value<String?>? snippet,
       Value<String?>? htmlBody,
       Value<String?>? plainBody,
-      Value<String>? headers,
+      Value<String?>? headers,
       Value<bool>? isDeleted,
       Value<int>? rowid}) {
     return EmailsCompanion(

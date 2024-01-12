@@ -450,7 +450,7 @@ class GmailScannerIsolate {
           //write bytes to file
           file.writeAsBytesSync(base64.decode(apiMsg.data!));
 
-          logger.v('Download Attachment: $fileName | dir:$dir | messageId: $messageId');
+          logger.t('Download Attachment: $fileName | dir:$dir | messageId: $messageId');
           File f = File(Uuid.v4().toString(), collection.id, fileName, file.path, dir.path, msgDateTime, msgDateTime, 0,
               contentType);
           files.add(f);
