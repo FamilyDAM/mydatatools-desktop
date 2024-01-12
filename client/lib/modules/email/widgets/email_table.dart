@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:moment_dart/moment_dart.dart';
 
 class EmailTable extends StatefulWidget {
-  const EmailTable({Key? key, required this.count, required this.emails}) : super(key: key);
+  const EmailTable({super.key, required this.count, required this.emails});
 
   final int count;
   final List<Email> emails;

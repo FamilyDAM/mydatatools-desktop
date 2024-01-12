@@ -924,6 +924,18 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
   late final GeneratedColumn<String> from = GeneratedColumn<String>(
       'from', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _toMeta = const VerificationMeta('to');
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String> to =
+      GeneratedColumn<String>('to', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<List<String>>($EmailsTable.$converterto);
+  static const VerificationMeta _ccMeta = const VerificationMeta('cc');
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String> cc =
+      GeneratedColumn<String>('cc', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<List<String>>($EmailsTable.$convertercc);
   static const VerificationMeta _subjectMeta =
       const VerificationMeta('subject');
   @override
@@ -948,6 +960,12 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
   late final GeneratedColumn<String> plainBody = GeneratedColumn<String>(
       'plain_body', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _labelsMeta = const VerificationMeta('labels');
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String> labels =
+      GeneratedColumn<String>('labels', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<List<String>>($EmailsTable.$converterlabels);
   static const VerificationMeta _headersMeta =
       const VerificationMeta('headers');
   @override
@@ -970,10 +988,13 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
         collectionId,
         date,
         from,
+        to,
+        cc,
         subject,
         snippet,
         htmlBody,
         plainBody,
+        labels,
         headers,
         isDeleted
       ];
@@ -1012,6 +1033,8 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
     } else if (isInserting) {
       context.missing(_fromMeta);
     }
+    context.handle(_toMeta, const VerificationResult.success());
+    context.handle(_ccMeta, const VerificationResult.success());
     if (data.containsKey('subject')) {
       context.handle(_subjectMeta,
           subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta));
@@ -1028,6 +1051,7 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
       context.handle(_plainBodyMeta,
           plainBody.isAcceptableOrUnknown(data['plain_body']!, _plainBodyMeta));
     }
+    context.handle(_labelsMeta, const VerificationResult.success());
     if (data.containsKey('headers')) {
       context.handle(_headersMeta,
           headers.isAcceptableOrUnknown(data['headers']!, _headersMeta));
@@ -1053,6 +1077,10 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
       from: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}from'])!,
+      to: $EmailsTable.$converterto.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}to'])!),
+      cc: $EmailsTable.$convertercc.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cc'])!),
       subject: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}subject']),
       snippet: attachedDatabase.typeMapping
@@ -1061,6 +1089,8 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
           .read(DriftSqlType.string, data['${effectivePrefix}html_body']),
       plainBody: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}plain_body']),
+      labels: $EmailsTable.$converterlabels.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}labels'])!),
       headers: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}headers']),
       isDeleted: attachedDatabase.typeMapping
@@ -1072,6 +1102,13 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
   $EmailsTable createAlias(String alias) {
     return $EmailsTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<List<String>, String> $converterto =
+      const StringArrayConverter();
+  static TypeConverter<List<String>, String> $convertercc =
+      const StringArrayConverter();
+  static TypeConverter<List<String>, String> $converterlabels =
+      const StringArrayConverter();
 }
 
 class EmailsCompanion extends UpdateCompanion<Email> {
@@ -1079,10 +1116,13 @@ class EmailsCompanion extends UpdateCompanion<Email> {
   final Value<String> collectionId;
   final Value<DateTime> date;
   final Value<String> from;
+  final Value<List<String>> to;
+  final Value<List<String>> cc;
   final Value<String?> subject;
   final Value<String?> snippet;
   final Value<String?> htmlBody;
   final Value<String?> plainBody;
+  final Value<List<String>> labels;
   final Value<String?> headers;
   final Value<bool> isDeleted;
   final Value<int> rowid;
@@ -1091,10 +1131,13 @@ class EmailsCompanion extends UpdateCompanion<Email> {
     this.collectionId = const Value.absent(),
     this.date = const Value.absent(),
     this.from = const Value.absent(),
+    this.to = const Value.absent(),
+    this.cc = const Value.absent(),
     this.subject = const Value.absent(),
     this.snippet = const Value.absent(),
     this.htmlBody = const Value.absent(),
     this.plainBody = const Value.absent(),
+    this.labels = const Value.absent(),
     this.headers = const Value.absent(),
     this.isDeleted = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1104,26 +1147,35 @@ class EmailsCompanion extends UpdateCompanion<Email> {
     required String collectionId,
     required DateTime date,
     required String from,
+    required List<String> to,
+    required List<String> cc,
     this.subject = const Value.absent(),
     this.snippet = const Value.absent(),
     this.htmlBody = const Value.absent(),
     this.plainBody = const Value.absent(),
+    required List<String> labels,
     this.headers = const Value.absent(),
     this.isDeleted = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         collectionId = Value(collectionId),
         date = Value(date),
-        from = Value(from);
+        from = Value(from),
+        to = Value(to),
+        cc = Value(cc),
+        labels = Value(labels);
   static Insertable<Email> custom({
     Expression<String>? id,
     Expression<String>? collectionId,
     Expression<DateTime>? date,
     Expression<String>? from,
+    Expression<String>? to,
+    Expression<String>? cc,
     Expression<String>? subject,
     Expression<String>? snippet,
     Expression<String>? htmlBody,
     Expression<String>? plainBody,
+    Expression<String>? labels,
     Expression<String>? headers,
     Expression<bool>? isDeleted,
     Expression<int>? rowid,
@@ -1133,10 +1185,13 @@ class EmailsCompanion extends UpdateCompanion<Email> {
       if (collectionId != null) 'collection_id': collectionId,
       if (date != null) 'date': date,
       if (from != null) 'from': from,
+      if (to != null) 'to': to,
+      if (cc != null) 'cc': cc,
       if (subject != null) 'subject': subject,
       if (snippet != null) 'snippet': snippet,
       if (htmlBody != null) 'html_body': htmlBody,
       if (plainBody != null) 'plain_body': plainBody,
+      if (labels != null) 'labels': labels,
       if (headers != null) 'headers': headers,
       if (isDeleted != null) 'is_deleted': isDeleted,
       if (rowid != null) 'rowid': rowid,
@@ -1148,10 +1203,13 @@ class EmailsCompanion extends UpdateCompanion<Email> {
       Value<String>? collectionId,
       Value<DateTime>? date,
       Value<String>? from,
+      Value<List<String>>? to,
+      Value<List<String>>? cc,
       Value<String?>? subject,
       Value<String?>? snippet,
       Value<String?>? htmlBody,
       Value<String?>? plainBody,
+      Value<List<String>>? labels,
       Value<String?>? headers,
       Value<bool>? isDeleted,
       Value<int>? rowid}) {
@@ -1160,10 +1218,13 @@ class EmailsCompanion extends UpdateCompanion<Email> {
       collectionId: collectionId ?? this.collectionId,
       date: date ?? this.date,
       from: from ?? this.from,
+      to: to ?? this.to,
+      cc: cc ?? this.cc,
       subject: subject ?? this.subject,
       snippet: snippet ?? this.snippet,
       htmlBody: htmlBody ?? this.htmlBody,
       plainBody: plainBody ?? this.plainBody,
+      labels: labels ?? this.labels,
       headers: headers ?? this.headers,
       isDeleted: isDeleted ?? this.isDeleted,
       rowid: rowid ?? this.rowid,
@@ -1185,6 +1246,12 @@ class EmailsCompanion extends UpdateCompanion<Email> {
     if (from.present) {
       map['from'] = Variable<String>(from.value);
     }
+    if (to.present) {
+      map['to'] = Variable<String>($EmailsTable.$converterto.toSql(to.value));
+    }
+    if (cc.present) {
+      map['cc'] = Variable<String>($EmailsTable.$convertercc.toSql(cc.value));
+    }
     if (subject.present) {
       map['subject'] = Variable<String>(subject.value);
     }
@@ -1196,6 +1263,10 @@ class EmailsCompanion extends UpdateCompanion<Email> {
     }
     if (plainBody.present) {
       map['plain_body'] = Variable<String>(plainBody.value);
+    }
+    if (labels.present) {
+      map['labels'] =
+          Variable<String>($EmailsTable.$converterlabels.toSql(labels.value));
     }
     if (headers.present) {
       map['headers'] = Variable<String>(headers.value);
@@ -1216,10 +1287,13 @@ class EmailsCompanion extends UpdateCompanion<Email> {
           ..write('collectionId: $collectionId, ')
           ..write('date: $date, ')
           ..write('from: $from, ')
+          ..write('to: $to, ')
+          ..write('cc: $cc, ')
           ..write('subject: $subject, ')
           ..write('snippet: $snippet, ')
           ..write('htmlBody: $htmlBody, ')
           ..write('plainBody: $plainBody, ')
+          ..write('labels: $labels, ')
           ..write('headers: $headers, ')
           ..write('isDeleted: $isDeleted, ')
           ..write('rowid: $rowid')

@@ -3,6 +3,7 @@ import 'dart:io' as io;
 import 'package:client/app_logger.dart';
 import 'package:client/models/tables/app_user.dart';
 import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/converters/string_array_convertor.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/models/tables/file.dart';
 import 'package:client/models/tables/folder.dart';

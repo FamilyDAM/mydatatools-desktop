@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:client/models/tables/converters/string_array_convertor.dart';
 import 'package:client/models/tables/file.dart';
 import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
@@ -14,13 +17,13 @@ class Emails extends Table {
   TextColumn get collectionId => text()();
   DateTimeColumn get date => dateTime()();
   TextColumn? get from => text()();
-  //List<String> to = [];
-  //List<String> cc = [];
+  TextColumn get to => text().map(const StringArrayConverter())();
+  TextColumn get cc => text().map(const StringArrayConverter())();
   TextColumn? get subject => text().nullable()();
   TextColumn? get snippet => text().nullable()();
   TextColumn? get htmlBody => text().nullable()();
   TextColumn? get plainBody => text().nullable()();
-  //List<String> labels = [];
+  TextColumn get labels => text().map(const StringArrayConverter())();
   TextColumn? get headers => text().nullable()();
   //List<File> attachments = [];
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
@@ -34,7 +37,7 @@ class Email implements Insertable<Email> {
   String collectionId;
   DateTime date;
   String from;
-  List<String> to = [];
+  List<String> to;
   List<String>? cc = [];
   String? subject;
   String? snippet;
@@ -70,13 +73,13 @@ class Email implements Insertable<Email> {
       required this.collectionId,
       required this.date,
       required this.from,
-      //required this.to,
-      //required this.cc,
+      required this.to,
+      this.cc,
       this.subject,
       this.snippet,
       this.htmlBody,
       this.plainBody,
-      //this.labels,
+      this.labels,
       this.headers,
       //required this.attachments,
       required this.isDeleted});
@@ -88,10 +91,13 @@ class Email implements Insertable<Email> {
       collectionId: Value(collectionId),
       date: Value(date),
       from: Value(from),
+      to: Value(to),
+      cc: Value(cc ?? []),
       subject: Value(subject),
       snippet: Value(snippet),
       htmlBody: Value(htmlBody),
       plainBody: Value(plainBody),
+      labels: Value(labels ?? []),
       headers: Value(headers),
       isDeleted: Value(isDeleted),
     ).toColumns(nullToAbsent);

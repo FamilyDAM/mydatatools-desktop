@@ -83,7 +83,9 @@ void main() {
           collectionId: Uuid.v4().toString(),
           date: DateTime.now(),
           from: 'blah@blah.com',
-          to: ['foo@foo.com'],
+          to: ['foo-a@foo.com', 'foo-b@foo.com'],
+          cc: ['foo-1-cc@foo.com', 'foo-2-cc@foo.com'],
+          labels: ['label-1', 'label-2'],
           subject: "test email",
           isDeleted: false);
 
@@ -95,7 +97,9 @@ void main() {
       expect(allItems.length, equals(1));
       expect(allItems[0].id, equals(email.id));
       expect(allItems[0].from, equals(email.from));
-      //expect(allItems[0].to, equals(email.to));
+      expect(allItems[0].to, equals(email.to));
+      expect(allItems[0].cc, equals(email.cc));
+      expect(allItems[0].labels, equals(email.labels));
       expect(allItems[0].subject, equals(email.subject));
       expect(allItems[0].date.difference(email.date).inSeconds, equals(0));
 
