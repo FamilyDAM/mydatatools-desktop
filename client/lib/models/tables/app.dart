@@ -1,8 +1,6 @@
 import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
 
-//part 'app.g.dart';
-
 @UseRowClass(App, constructor: 'fromDb')
 class Apps extends Table {
   TextColumn get id => text()();

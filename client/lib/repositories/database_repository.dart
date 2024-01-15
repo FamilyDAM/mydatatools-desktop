@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io' as io;
 import 'package:client/app_logger.dart';
+import 'package:client/models/tables/album.dart';
 import 'package:client/models/tables/app_user.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/converters/string_array_convertor.dart';
@@ -44,7 +45,7 @@ class DatabaseRepository {
   }
 }
 
-@DriftDatabase(tables: [Apps, AppUsers, Collections, Emails, Files, Folders])
+@DriftDatabase(tables: [Apps, AppUsers, Collections, Emails, Files, Folders, Albums])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(String path, String name) : super(_openConnection(path, name));
 
