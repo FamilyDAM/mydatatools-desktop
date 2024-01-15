@@ -82,7 +82,7 @@ class GmailScannerIsolate {
   }
 
   AppDatabase _initDatabase(String path_) {
-    DatabaseRepository databaseRepository = DatabaseRepository(path_, AppConstants.dbFileName); //dbName
+    DatabaseRepository databaseRepository = DatabaseRepository(path_, AppConstants.dbName); //dbName
 
     print("Sqlite Db initialized in local file = ${databaseRepository.database.path}");
 

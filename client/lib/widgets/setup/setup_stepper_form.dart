@@ -79,7 +79,7 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
       File('$supportDir${Platform.pathSeparator}${AppConstants.configFileName}').writeAsStringSync(jsonConfig);
 
       //initialize empty database in the user defined directory
-      DatabaseRepository(supportDir, AppConstants.dbFileName);
+      DatabaseRepository(supportDir, AppConstants.dbName);
       UserRepository userRepository = UserRepository(DatabaseRepository.instance!.database);
 
       //Create new instance of User

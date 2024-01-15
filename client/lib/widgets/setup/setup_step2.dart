@@ -90,7 +90,7 @@ class _SetupStep2State extends State<SetupStep2> {
               String? result = await FilePicker.platform.getDirectoryPath();
               if (result != null) {
                 storageForm.findControl('storageLocation')?.value = result;
-                AppRouter.supportDirectory.add(result);
+                AppRouter.databaseDirectory.add(result);
               } else {
                 // User canceled the picker, do nothing
               }

@@ -30,6 +30,7 @@ import 'package:rxdart/rxdart.dart';
 
 class AppRouter {
   static final BehaviorSubject supportDirectory = BehaviorSubject();
+  static final BehaviorSubject databaseDirectory = BehaviorSubject();
   static GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static get instance => GoRouter(

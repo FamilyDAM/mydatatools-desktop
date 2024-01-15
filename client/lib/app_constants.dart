@@ -3,7 +3,6 @@ class AppConstants {
   static const String appName = "MyDataTools";
   static const String configFileName = "config.json";
   static const String dbName = "mydata.db"; //sqlite
-  static const String dbFileName = "metadata.realm"; //mongo realm
 
   //DB Constants
   static const int schemaVersion = 1;

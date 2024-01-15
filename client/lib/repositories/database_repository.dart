@@ -8,6 +8,7 @@ import 'package:client/models/tables/converters/string_array_convertor.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/models/tables/file.dart';
 import 'package:client/models/tables/folder.dart';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 import 'package:drift/native.dart';
 import 'package:drift/drift.dart';
@@ -16,6 +17,7 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:client/app_constants.dart';
 import 'package:client/models/tables/app.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 part 'database_repository.g.dart';
 
@@ -30,7 +32,9 @@ class DatabaseRepository {
 
   DatabaseRepository(String? databasePath, String? databaseName) {
     //initialized db
-    database = AppDatabase(databasePath ?? ".", databaseName ?? AppConstants.configFileName);
+    if (_instance == null) {
+      database = AppDatabase(databasePath ?? ".", databaseName ?? AppConstants.configFileName);
+    }
 
     _instance = this;
   }
@@ -46,6 +50,7 @@ class DatabaseRepository {
 
 @DriftDatabase(tables: [Apps, AppUsers, Collections, Emails, Files, Folders, Albums])
 class AppDatabase extends _$AppDatabase {
+  final AppLogger logger = AppLogger(null);
   AppDatabase(String path, String name) : super(_openConnection(path, name));
 
   String? path;
@@ -59,13 +64,12 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         print("Creating all Tables");
         await m.createAll();
+        print("Load initial data");
+        _loadInitialData(m);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
-          print("Upgrade tables to v2");
-          // we added the dueDate property in the change from version 1 to
-          // version 2
-          //await m.addColumn(todos, todos.dueDate);
+          print("Upgrade to v2");
         }
         if (from < 3) {
           print("Upgrade tables to v3");
@@ -76,6 +80,60 @@ class AppDatabase extends _$AppDatabase {
       },
     );
   }
+
+  /// Make sure each app is in database
+  void _loadInitialData(Migrator m) async {
+    try {
+      //Load initial data
+      TableInfo<Table, dynamic>? appsTable = m.database.allTables.firstWhereOrNull((e) => e.actualTableName == 'apps');
+
+      List<dynamic> apps = await m.database.select(appsTable!).get();
+      //apps
+      if (!apps.any((element) => element.slug == "files")) {
+        m.database.into(appsTable).insert(App(
+            id: const Uuid().v4().toString(),
+            name: "Files",
+            slug: 'files',
+            group: "collections",
+            order: 10,
+            icon: 0xe2a3,
+            route: "/files"));
+      }
+      if (!apps.any((element) => element.slug == "email")) {
+        m.database.into(appsTable).insert(App(
+            id: const Uuid().v4().toString(),
+            name: "Email",
+            slug: 'email',
+            group: "collections",
+            order: 30,
+            icon: 0xe2a3,
+            route: "/email"));
+      }
+      if (!apps.any((element) => element.slug == "social")) {
+        m.database.into(appsTable).insert(App(
+            id: const Uuid().v4().toString(),
+            name: "Social Networks",
+            slug: 'social',
+            group: "collections",
+            order: 50,
+            icon: 0xe2a3,
+            route: "/social"));
+      }
+      if (!apps.any((element) => element.slug == "photos")) {
+        m.database.into(appsTable).insert(App(
+            id: const Uuid().v4().toString(),
+            name: "Photos",
+            slug: 'photos',
+            group: "app",
+            order: 20,
+            icon: 0xe2a3,
+            route: "/photos"));
+      }
+    } catch (err) {
+      logger.e(err);
+      rethrow;
+    }
+  }
 }
 
 LazyDatabase _openConnection(String path, String name) {
@@ -83,7 +141,7 @@ LazyDatabase _openConnection(String path, String name) {
   return LazyDatabase(() async {
     print("Initialize Database");
     //check app startup initialization
-    io.File file = io.File(p.join(path, name));
+    io.File file = io.File(p.join(path, 'data', name));
     path = file.path;
     //start with default path and override if one is defined in config
     if (file.existsSync()) {
@@ -92,10 +150,6 @@ LazyDatabase _openConnection(String path, String name) {
       path = jsonDecode(storageFile)['path'];
     }
 
-    //set subfolder for data;
-    path = p.join(path, 'data', name);
-    final dbFile = io.File(path);
-
     // Make sqlite3 pick a more suitable location for temporary files - the
     // one from the system may be inaccessible due to sandboxing.
     final cachebase = (await getTemporaryDirectory()).path;
@@ -103,7 +157,7 @@ LazyDatabase _openConnection(String path, String name) {
     // Explicitly tell it about the correct temporary directory.
     sqlite3.tempDirectory = cachebase;
 
-    print("Opening Database | ${dbFile.path}");
-    return NativeDatabase.createInBackground(dbFile, logStatements: true, cachePreparedStatements: true, setup: null);
+    print("Opening Database | $path");
+    return NativeDatabase.createInBackground(file, logStatements: true, cachePreparedStatements: true, setup: null);
   });
 }

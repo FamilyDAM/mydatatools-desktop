@@ -35,7 +35,7 @@ class CollectionWatcherIsolate {
       BackgroundIsolateBinaryMessenger.ensureInitialized(token!);
     }
 
-    DatabaseRepository databaseRepository = DatabaseRepository(path, AppConstants.dbFileName); //dbName
+    DatabaseRepository databaseRepository = DatabaseRepository(path, AppConstants.dbName); //dbName
     print("Sqlite Db initialized in local file = ${databaseRepository.database.path}");
 
     fileSystemRepository = FileSystemRepository(databaseRepository.database);
