@@ -1,4 +1,4 @@
-import 'package:client/models/collection_model.dart';
+import 'package:client/models/tables/collection.dart';
 import 'package:client/oauth/login_providers.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +40,7 @@ class AuthDialogManager {
                       label: const Text("Login with Google"),
                       onPressed: () async {
                         await LoginProviderExtension.handleGoogleMail(context, collection);
-                        //todo close dialog
+                        // TODO close dialog
                       }),
                 ),
               ),

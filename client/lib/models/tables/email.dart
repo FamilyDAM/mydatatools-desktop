@@ -1,11 +1,9 @@
-import 'dart:ffi';
-
 import 'package:client/models/tables/converters/string_array_convertor.dart';
 import 'package:client/models/tables/file.dart';
 import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
 
-part 'email.g.dart';
+//part 'email.g.dart';
 
 @UseRowClass(Email, constructor: 'fromDb')
 @TableIndex(name: 'email_id_idx', columns: {#id})

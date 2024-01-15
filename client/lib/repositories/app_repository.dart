@@ -1,11 +1,13 @@
-import 'package:client/models/app_models.dart';
-import 'package:realm/realm.dart';
+import 'package:client/models/tables/app.dart';
+import 'package:client/repositories/database_repository.dart';
 
 class AppRepository {
-  final Realm database;
+  final AppDatabase database;
   AppRepository(this.database);
 
-  List<Apps> apps() {
-    return database.all<Apps>().toList();
+  ///
+  /// Get a list of all Apps
+  Future<List<App>> apps() async {
+    return await database.select(database.apps).get();
   }
 }

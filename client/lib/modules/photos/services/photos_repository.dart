@@ -1,21 +1,25 @@
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/file.dart';
 import 'package:client/modules/files/files_constants.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:intl/intl.dart';
-import 'package:realm/realm.dart';
 
 class PhotosRepository {
-  Realm database;
+  AppDatabase database;
   PhotosRepository(this.database);
 
-  List<File> photos() {
-    return database.query<File>("contentType = '${FilesConstants.mimeTypeImage}' SORT(dateCreated DESC)").toList();
+  Future<List<File>> photos() async {
+    return await (database.select(database.files)..where((e) => e.contentType.equals(FilesConstants.mimeTypeImage)))
+        .get();
+    // TODO add sort  SORT(dateCreated DESC)
   }
 
-  Map<String, List<File>> photosByDate() {
+  Future<Map<String, List<File>>> photosByDate() async {
     DateFormat dateFormat = DateFormat("yyyy-MM-dd");
     Map<String, List<File>> groupedImages = {};
     List<File> p =
-        database.query<File>("contentType = '${FilesConstants.mimeTypeImage}' SORT(dateCreated ASC)").toList();
+        await (database.select(database.files)..where((e) => e.contentType.equals(FilesConstants.mimeTypeImage))).get();
+
+    // TODO add sort SORT(dateCreated ASC)
 
     for (var f in p) {
       String group = dateFormat.format(f.dateCreated);

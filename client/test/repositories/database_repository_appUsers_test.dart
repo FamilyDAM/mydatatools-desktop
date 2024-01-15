@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +20,7 @@ void main() {
       //https://github.com/flutter/flutter/issues/10912#issuecomment-587403632
       TestWidgetsFlutterBinding.ensureInitialized();
       const MethodChannel channel = MethodChannel('plugins.flutter.io/path_provider');
+      // ignore: deprecated_member_use
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
         return ".";
       });
@@ -57,7 +58,7 @@ void main() {
 
     test("Delete AppUser", () async {
       m.AppUser user = m.AppUser(
-          id: Uuid.v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
+          id: const Uuid().v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
       var db = databaseRepository.database!;
       await db.into(db.appUsers).insert(user);
 
@@ -72,7 +73,7 @@ void main() {
 
     test("check all properties are saved", () async {
       m.AppUser user = m.AppUser(
-          id: Uuid.v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
+          id: const Uuid().v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
       var db = databaseRepository.database!;
       await db.into(db.appUsers).insert(user);
 
@@ -92,11 +93,23 @@ void main() {
 
     test("Insert multiple AppUsers", () async {
       m.AppUser user1 = m.AppUser(
-          id: Uuid.v4().toString(), name: "mike-1", email: "foo@foo.com", password: "123", localStoragePath: ".");
+          id: const Uuid().v4().toString(),
+          name: "mike-1",
+          email: "foo@foo.com",
+          password: "123",
+          localStoragePath: ".");
       m.AppUser user2 = m.AppUser(
-          id: Uuid.v4().toString(), name: "mike-2", email: "foo@foo.com", password: "123", localStoragePath: ".");
+          id: const Uuid().v4().toString(),
+          name: "mike-2",
+          email: "foo@foo.com",
+          password: "123",
+          localStoragePath: ".");
       m.AppUser user3 = m.AppUser(
-          id: Uuid.v4().toString(), name: "mike-3", email: "foo@foo.com", password: "123", localStoragePath: ".");
+          id: const Uuid().v4().toString(),
+          name: "mike-3",
+          email: "foo@foo.com",
+          password: "123",
+          localStoragePath: ".");
       var db = databaseRepository.database!;
       await db.into(db.appUsers).insert(user1);
       await db.into(db.appUsers).insert(user2);

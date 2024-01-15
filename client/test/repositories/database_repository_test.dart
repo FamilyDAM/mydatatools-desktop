@@ -22,6 +22,7 @@ void main() {
       TestWidgetsFlutterBinding.ensureInitialized();
 
       const MethodChannel channel = MethodChannel('plugins.flutter.io/path_provider');
+      // ignore: deprecated_member_use
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
         return ".";
       });

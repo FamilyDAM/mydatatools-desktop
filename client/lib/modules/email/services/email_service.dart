@@ -1,8 +1,8 @@
 import 'package:client/app_logger.dart';
-import 'package:client/models/collection_model.dart';
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/email.dart';
 import 'package:client/modules/email/services/email_repository.dart';
-import 'package:client/repositories/realm_repository.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/rx_service.dart';
 
 class EmailService extends RxService<EmailServiceCommand, List<Email>> {
@@ -15,12 +15,12 @@ class EmailService extends RxService<EmailServiceCommand, List<Email>> {
   @override
   Future<List<Email>> invoke(EmailServiceCommand command) async {
     isLoading.add(true);
-    emailRepository = EmailRepository(RealmRepository.instance.database);
+    emailRepository = EmailRepository(DatabaseRepository.instance.database!);
 
     //first check for newest emails
 
     //load files and folders from db
-    List<Email> emails = emailRepository!.emails(command.collection.id, command.sortColumn, command.sortAsc);
+    List<Email> emails = await emailRepository!.emails(command.collection.id, command.sortColumn, command.sortAsc);
     sink.add(emails);
     isLoading.add(false);
     return Future(() => emails);

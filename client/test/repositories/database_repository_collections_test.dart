@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +22,7 @@ void main() {
       //https://github.com/flutter/flutter/issues/10912#issuecomment-587403632
       TestWidgetsFlutterBinding.ensureInitialized();
       const MethodChannel channel = MethodChannel('plugins.flutter.io/path_provider');
+      // ignore: deprecated_member_use
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
         return ".";
       });
@@ -59,7 +60,7 @@ void main() {
 
     test("Delete Collection", () async {
       m.Collection collection = m.Collection(
-          id: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
           name: "Files",
           path: "/files",
           type: "file",
@@ -80,7 +81,7 @@ void main() {
 
     test("check all properties are saved", () async {
       m.Collection collection = m.Collection(
-          id: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
           name: "Files",
           path: "/files",
           type: "file",
@@ -114,7 +115,7 @@ void main() {
 
     test("update nullable props in db", () async {
       m.Collection collection = m.Collection(
-          id: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
           name: "Files",
           path: "/files",
           type: "file",
@@ -166,7 +167,7 @@ void main() {
 
     test("Insert multiple Collections", () async {
       m.Collection collection1 = m.Collection(
-          id: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
           name: "Files",
           path: "/files",
           type: "file",
@@ -174,7 +175,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
       m.Collection collection2 = m.Collection(
-          id: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
           name: "Files",
           path: "/files",
           type: "file",
@@ -182,7 +183,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
       m.Collection collection3 = m.Collection(
-          id: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
           name: "Files",
           path: "/files",
           type: "file",

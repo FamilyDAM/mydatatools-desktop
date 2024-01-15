@@ -8,19 +8,19 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:client/app_constants.dart';
-import 'package:client/models/collection_model.dart';
+import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/oauth/desktop_oauth_manager.dart';
 import 'package:client/oauth/login_providers.dart';
 import 'package:client/repositories/collection_repository.dart';
-import 'package:client/repositories/realm_repository.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 class NewEmailPage extends StatefulWidget {
   const NewEmailPage({super.key});
@@ -221,7 +221,7 @@ class _NewEmailPage extends State<NewEmailPage> {
   handleYahooMail(BuildContext context, List<Collection> collections) async {
     //Scopes:
     //https://www.googleapis.com/auth/gmail.readonly
-    //todo: Security Assessment will be required
+    // TODO: Security Assessment will be required
     //@see https://support.google.com/cloud/answer/9110914#zippy=%2Cgmail-api%2Cexceptions-to-verification-requirements%2Csteps-to-prepare-for-verification%2Csteps-for-apps-requesting-sensitive-scopes%2Csteps-for-apps-requesting-restricted-scopes%2Csteps-to-submit-your-app%2Csecurity-assessment
     if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
       final provider = DesktopOAuthManager(loginProvider: LoginProviders.google);
@@ -239,24 +239,33 @@ class _NewEmailPage extends State<NewEmailPage> {
         var emails = user['emailAddresses'] as List;
         var email = emails.firstWhere((element) => (element['metadata']['primary'] ?? false) == true)['value'];
 
-        //Find existing email
+        // Find existing email
         var existingCollection = collections.firstWhereOrNull((element) => element.name == email);
 
-        var id = existingCollection?.id ?? Uuid.v4().toString();
-        var root = File(RealmRepository.instance.database.config.path).parent.parent;
+        var id = existingCollection?.id ?? const Uuid().v4().toString();
+
+        // figure out local path to db directory, so we know where to store all local cached files (such as email attachments we download)
+        var root = File(DatabaseRepository.instance.database!.path!).parent.parent;
 
         // Create/Update Collection with the following bits of oauth data
         Collection collection = Collection(
-            id, email, "${root.path}/files/email/$email", "email", AppConstants.scannerEmailGmail, "pending",
+            id: id,
+            name: email,
+            path: "${root.path}/files/email/$email",
+            type: "email",
+            scanner: AppConstants.scannerEmailGmail,
+            scanStatus: "pending",
             oauthService: "google",
             accessToken: client.credentials.accessToken,
             refreshToken: client.credentials.refreshToken,
             idToken: client.credentials.idToken,
             userId: userId,
-            expiration: client.credentials.expiration);
+            expiration: client.credentials.expiration,
+            needsReAuth: false);
 
         //Save collection
-        CollectionRepository(RealmRepository.instance.database).addCollection(collection).then((value) {
+        // TODO create Service for addCollection
+        CollectionRepository(DatabaseRepository.instance.database!).addCollection(collection).then((value) {
           GetCollectionsService.instance.invoke(GetCollectionsServiceCommand("email")); //reload all
           //make new default selected collection
           EmailPage.selectedCollection.add(value);

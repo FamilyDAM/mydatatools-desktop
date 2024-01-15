@@ -2,7 +2,7 @@ import 'package:client/models/tables/file_asset.dart';
 import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
 
-part 'folder.g.dart';
+//part 'folder.g.dart';
 
 @UseRowClass(Folder, constructor: 'fromDb')
 @TableIndex(name: 'folder_path_idx', columns: {#path})

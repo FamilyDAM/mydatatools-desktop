@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:client/app_constants.dart';
-import 'package:client/models/app_models.dart';
+import 'package:client/models/tables/app.dart' as m;
 import 'package:client/services/get_apps_service.dart';
 import 'package:client/services/get_user_service.dart';
 import 'package:flutter/gestures.dart';
@@ -25,7 +25,7 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
   int currentSelectedIndex = 0;
   GetAppsService? _getAppsService;
   StreamSubscription? _appsSub;
-  List<Apps> apps = [];
+  List<m.App> apps = [];
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
         animation: _animationController!, builder: (context, widget) => getWidget(context, widget, apps));
   }
 
-  Widget getWidget(context, widget, List<Apps> apps) {
+  Widget getWidget(context, widget, List<m.App> apps) {
     //final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final theme = Theme.of(context);
     double iconPadding = isCollapsed ? 20.0 : 16.0;

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io' as io;
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/file.dart';
 import 'package:client/modules/files/files_constants.dart';
 import 'package:image/image.dart' as img;
 
@@ -31,7 +31,7 @@ class ThumbnailGenerator {
     }
 
     if (!thumbGenerated) {
-      //todo, check EXIF data and see if thumbnail exists in exif (TIF, JPG often have this)
+      // TODO, check EXIF data and see if thumbnail exists in exif (TIF, JPG often have this)
     }
 
     return Future(() => null);

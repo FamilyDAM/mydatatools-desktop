@@ -1,4 +1,4 @@
-import 'package:client/models/collection_model.dart';
+import 'package:client/models/tables/collection.dart';
 
 class CollectionScanner {
   Future<int> start(Collection collection, String? path, bool recursive, bool force) async {

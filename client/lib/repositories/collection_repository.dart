@@ -1,41 +1,45 @@
-import 'package:client/models/collection_model.dart';
-import 'package:realm/realm.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/repositories/database_repository.dart';
 
 class CollectionRepository {
-  final Realm database;
+  final AppDatabase database;
   CollectionRepository(this.database);
 
-  List<Collection> collections() {
-    List<Collection> results = database.all<Collection>().toList();
+  Future<List<Collection>> collections() async {
+    List<Collection> results = await database.select(database.collections).get();
 
     return results;
   }
 
-  List<Collection> collectionsByType(String type) {
-    List<Collection> r = database.all<Collection>().where((element) => element.type == type).toList();
+  Future<List<Collection>> collectionsByType(String type) async {
+    List<Collection> r =
+        await (database.select(database.collections)..where((element) => element.type.equals(type))).get();
     return r;
   }
 
-  Collection? collectionById(String val) {
-    List<Collection> r = database.all<Collection>().where((element) => element.id == val).toList();
+  Future<Collection?> collectionById(String val) async {
+    List<Collection> r =
+        await (database.select(database.collections)..where((element) => element.id.equals(val))).get();
     return r.first;
   }
 
-  Collection getCollectionByPath(String path) {
-    List<Collection> r = database.all<Collection>().where((element) => element.path == path).toList();
+  Future<Collection?> getCollectionByPath(String path) async {
+    List<Collection> r =
+        await (database.select(database.collections)..where((element) => element.path.equals(path))).get();
     return r.first;
   }
 
-  Future addCollection(Collection val) {
-    return database.writeAsync(() {
-      database.add<Collection>(val, update: true);
-      //print('save collection ${val.name}');
-    });
+  ///
+  /// Create new collection
+  Future addCollection(Collection val) async {
+    database.into(database.collections).insert(val);
   }
 
-  void updateLastScanDate(Collection collection, DateTime? value) {
-    database.write(() {
-      collection.lastScanDate = DateTime.now();
-    });
+  ///
+  /// Update the scan date for services that check external systems on a schedule, such as email
+  void updateLastScanDate(Collection collection, DateTime? value) async {
+    //update date
+    collection.lastScanDate = DateTime.now();
+    await database.update(database.collections).write(collection);
   }
 }

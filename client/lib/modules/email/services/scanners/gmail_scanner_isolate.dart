@@ -4,16 +4,17 @@ import 'dart:isolate';
 
 import 'package:client/app_constants.dart';
 import 'package:client/app_logger.dart';
-import 'package:client/models/app_models.dart';
-import 'package:client/models/collection_model.dart';
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/email.dart';
+import 'package:client/models/tables/file.dart';
 import 'package:client/modules/email/services/email_repository.dart';
 import 'package:client/modules/email/services/email_service.dart';
 import 'package:client/oauth/google_auth_client.dart';
 import 'package:client/repositories/collection_repository.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:flutter/services.dart';
 import 'package:googleapis/gmail/v1.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 class GmailScannerIsolate {
   //constructor args
@@ -43,7 +44,7 @@ class GmailScannerIsolate {
         if (message == "command:refresh") {
           EmailService.instance.invoke(EmailServiceCommand(collection, "date", false));
         } else {
-          //todo
+          // TODO
         }
       }
     });
@@ -80,24 +81,20 @@ class GmailScannerIsolate {
     Isolate.exit(resultPort, fileCount);
   }
 
-  Realm _initDatabase(String path_) {
-    Configuration config = Configuration.local(
-        [Apps.schema, AppUser.schema, Collection.schema, Folder.schema, File.schema, Email.schema],
-        schemaVersion: AppConstants.schemaVersion,
-        shouldDeleteIfMigrationNeeded: AppConstants.shouldDeleteIfMigrationNeeded,
-        path: path_);
+  AppDatabase _initDatabase(String path_) {
+    DatabaseRepository databaseRepository = DatabaseRepository(path_, AppConstants.dbFileName); //dbName
 
-    Realm database = Realm(config);
-    print("Realm Db initialized in local file isolate = ${database.config.path}");
-    return database;
+    print("Sqlite Db initialized in local file = ${databaseRepository.database!.path}");
+
+    return databaseRepository.database!;
   }
 
   /// Starting method to run in isolate
-  Future<int> _scanEmail(Realm database, String collectionId) async {
+  Future<int> _scanEmail(AppDatabase database, String collectionId) async {
     CollectionRepository collectionRepository = CollectionRepository(database);
     EmailRepository emailRepository = EmailRepository(database);
 
-    Collection? collection = collectionRepository.collectionById(collectionId);
+    Collection? collection = await collectionRepository.collectionById(collectionId);
     if (collection == null) {
       logger.e("Collection Not Found, killing isolate");
       stop();
@@ -130,7 +127,7 @@ class GmailScannerIsolate {
   /// This will save all attachements to the local disk
   Future<int> _getNewestEmails(EmailRepository emailRepository, Collection collection, String accessToken) async {
     // Check token and refresh if needed
-    DateTime? maxDate = emailRepository.getMaxEmailDate(collection.id);
+    DateTime? maxDate = await emailRepository.getMaxEmailDate(collection.id);
     String? maxQuery = 'in:inbox';
     if (maxDate != null) {
       maxQuery = "after:${(maxDate.millisecondsSinceEpoch / 1000).floor()}";
@@ -148,7 +145,7 @@ class GmailScannerIsolate {
   /// This will save all attachements to the local disk
   Future<int> _getOldestEmails(EmailRepository emailRepository, Collection collection, String accessToken) async {
     int count = 0;
-    DateTime? minDate = emailRepository.getMinEmailDate(collection.id);
+    DateTime? minDate = await emailRepository.getMinEmailDate(collection.id);
     if (minDate != null) {
       String minQuery = "before:${(minDate.millisecondsSinceEpoch / 1000).floor()}";
 
@@ -205,7 +202,7 @@ class GmailScannerIsolate {
     ListMessagesResponse messagesResponse = await gmailApi.users.messages.list(collection.name,
         includeSpamTrash: includeSpamTrash,
         maxResults: 250,
-        pageToken: pageToken, //todo, remove
+        pageToken: pageToken, // TODO, remove
         q: query);
 
     //grab values out of response
@@ -226,7 +223,7 @@ class GmailScannerIsolate {
       MessagePartHeader? from = m.payload?.headers?.singleWhere((element) => element.name?.toLowerCase() == "from",
           orElse: () => MessagePartHeader(name: "From", value: null));
 
-      //todo, support array of TO headers
+      // TODO, support array of TO headers
       MessagePartHeader? to = m.payload?.headers?.firstWhere((element) => element.name?.toLowerCase() == "to",
           orElse: () => MessagePartHeader(name: "To", value: null));
 
@@ -253,17 +250,21 @@ class GmailScannerIsolate {
       }
 
       //build object
-      Email email = Email(id, collection.id, msgDateTime,
+      Email email = Email(
+          id: id,
+          collectionId: collection.id,
+          date: msgDateTime,
           subject: subject?.value,
           snippet: m.snippet,
           to: to?.value?.split(",") ?? [],
           cc: cc?.value?.split(",") ?? [],
-          from: from?.value,
+          from: from?.value ?? 'unknown',
           headers: headers,
           labels: m.labelIds ?? [],
           plainBody: plainPayload,
           htmlBody: htmlPayload,
-          attachments: attachments);
+          attachments: attachments,
+          isDeleted: false);
       emailBatch.add(email);
     }
 
@@ -321,7 +322,7 @@ class GmailScannerIsolate {
     ListMessagesResponse messagesResponse = await gmailApi.users.messages.list(collection.name,
         includeSpamTrash: includeSpamTrash,
         maxResults: 50,
-        pageToken: pageToken, //todo, remove
+        pageToken: pageToken, // TODO, remove
         q: query_);
 
     //grab values out of response
@@ -335,7 +336,7 @@ class GmailScannerIsolate {
       ids.add(id);
     }
     //find all emails in local db, and flip is deleted flag
-    emailBatch = emailRepository.getAllById(ids);
+    emailBatch = await emailRepository.getAllById(ids);
     for (Email e in emailBatch) {
       e.isDeleted = true;
     }
@@ -451,8 +452,17 @@ class GmailScannerIsolate {
           file.writeAsBytesSync(base64.decode(apiMsg.data!));
 
           logger.t('Download Attachment: $fileName | dir:$dir | messageId: $messageId');
-          File f = File(Uuid.v4().toString(), collection.id, fileName, file.path, dir.path, msgDateTime, msgDateTime, 0,
-              contentType);
+          File f = File(
+              id: const Uuid().v4().toString(),
+              collectionId: collection.id,
+              name: fileName,
+              path: file.path,
+              parent: dir.path,
+              dateCreated: msgDateTime,
+              dateLastModified: msgDateTime,
+              size: 0,
+              contentType: contentType,
+              isDeleted: false);
           files.add(f);
         } catch (e) {
           logger.w('Cannot parse attachment: $e | messageId: $messageId | part: $part');

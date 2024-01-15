@@ -19,7 +19,6 @@ All stored locally on your machine. No ads. No tracking. No selling your data. J
 # Build
 * Regenerate Models 
 ```bash
-flutter pub run realm generate
 dart run build_runner build
 ```
 

@@ -21,43 +21,17 @@ part 'database_repository.g.dart';
 class DatabaseRepository {
   final AppLogger logger = AppLogger(null);
 
-  static String? databasePath;
-  static String? databaseName;
+  AppDatabase? database;
 
   // only have a single app-wide reference to the database
-  static AppDatabase? _database;
-  AppDatabase? get database {
-    if (_database != null) return _database;
-    // instantiate the db the first time it is accessed
-    _initDatabase(DatabaseRepository.databasePath!, DatabaseRepository.databaseName!);
-    return _database;
-  }
-
-  set database(db) {
-    _database = db;
-  }
+  static DatabaseRepository? _instance;
+  static DatabaseRepository get instance => _instance!; //not null is safe to assume since this is set in constructor
 
   DatabaseRepository(String? databasePath, String? databaseName) {
-    if (DatabaseRepository.databaseName != null && DatabaseRepository.databaseName != databaseName) {
-      throw Exception(
-          "Two different DB names have been attempted - ${DatabaseRepository.databaseName} and $databaseName");
-    }
+    //initialized db
+    database = AppDatabase(databasePath ?? ".", databaseName ?? AppConstants.configFileName);
 
-    if (DatabaseRepository.databasePath != null && DatabaseRepository.databasePath != databasePath) {
-      throw Exception(
-          "Two different DB paths have been attempted - ${DatabaseRepository.databaseName} and $databaseName");
-    }
-
-    //use last used name if null, if this is the first time and it's null use the default name defined as an App Constant
-    DatabaseRepository.databasePath = databasePath ?? DatabaseRepository.databasePath ?? ".";
-    DatabaseRepository.databaseName = databaseName ?? DatabaseRepository.databaseName ?? AppConstants.configFileName;
-
-    //db will be initialized on first access, from getter
-  }
-
-  // this opens the database (and creates it if it doesn't exist)
-  _initDatabase(String path, String name) {
-    database = AppDatabase(path, name);
+    _instance = this;
   }
 
   // All of the rows are returned as a list of maps, where each map is
@@ -73,6 +47,8 @@ class DatabaseRepository {
 @DriftDatabase(tables: [Apps, AppUsers, Collections, Emails, Files, Folders])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(String path, String name) : super(_openConnection(path, name));
+
+  String? path;
 
   @override
   int get schemaVersion => 1;
@@ -108,17 +84,17 @@ LazyDatabase _openConnection(String path, String name) {
     print("Initialize Database");
     //check app startup initialization
     io.File file = io.File(p.join(path, name));
+    path = file.path;
     //start with default path and override if one is defined in config
-    String dbPath = path;
     if (file.existsSync()) {
       //pull location from config folder
       var storageFile = file.readAsStringSync();
-      dbPath = jsonDecode(storageFile)['path'];
+      path = jsonDecode(storageFile)['path'];
     }
 
     //set subfolder for data;
-    dbPath = p.join(dbPath, 'data', name);
-    final dbFile = io.File(dbPath);
+    path = p.join(path, 'data', name);
+    final dbFile = io.File(path);
 
     // Make sqlite3 pick a more suitable location for temporary files - the
     // one from the system may be inaccessible due to sandboxing.

@@ -5,8 +5,8 @@ import 'package:client/app_router.dart';
 import 'package:client/family_dam_app.dart';
 import 'package:client/widgets/auth_dialog_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:window_size/window_size.dart';
 import 'package:logger/logger.dart';
+import 'package:window_size/window_size.dart';
 
 /// The main() function is the starting point of the application. It first ensures that the Flutter binding is initialized.
 /// Then, it checks if the platform is Windows, Linux or macOS. If it is, it gets the current screen and sets the window title, minimum size and maximum size.

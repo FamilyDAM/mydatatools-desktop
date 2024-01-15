@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:client/helpers/encryption_form_validator.dart';
 import 'package:client/helpers/encryption_helper.dart';
-import 'package:client/models/app_models.dart';
+import 'package:client/models/tables/app_user.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:pointycastle/pointycastle.dart';
@@ -43,7 +43,7 @@ class _SetupStep3State extends State<SetupStep3> {
         appUser.privateKey = priFile.readAsStringSync();
       }
       //if existing files don't exists, generate new keys
-      else if (appUser.publicKey.isEmpty) {
+      else if (appUser.publicKey == null) {
         var encHelper = EncryptionHelper();
         AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey> keys = encHelper.generateRSAkeyPair();
         appUser.publicKey = encHelper.encodePublicKeyToPemPKCS1(keys.publicKey);
@@ -88,13 +88,13 @@ class _SetupStep3State extends State<SetupStep3> {
 
     var appUserClone = widget.appUser!;
     //handle async setup for validators
-    if (appUserClone.publicKey.isEmpty || appUserClone.privateKey.isEmpty) {
+    if (appUserClone.publicKey == null || appUserClone.privateKey == null) {
       appUserClone = initForm(appUserClone);
       //set form values
       encryptionForm.updateValue({'publicKey': appUserClone.publicKey, 'privateKey': appUserClone.privateKey});
     }
 
-    if (widget.appUser!.publicKey.isEmpty) {
+    if (widget.appUser!.publicKey == null) {
       return Container();
     }
 

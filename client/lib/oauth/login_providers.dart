@@ -3,15 +3,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:client/app_constants.dart';
-import 'package:client/models/collection_model.dart';
+import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/repositories/collection_repository.dart';
-import 'package:client/repositories/realm_repository.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:client/oauth/desktop_oauth_manager.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 enum LoginProviders { google, azure }
 
@@ -81,7 +81,7 @@ extension LoginProviderExtension on LoginProviders {
   static handleGoogleMail(BuildContext context, Collection? collection) async {
     //Scopes:
     //https://www.googleapis.com/auth/gmail.readonly
-    //todo: Security Assessment will be required
+    // TODO: Security Assessment will be required
     //@see https://support.google.com/cloud/answer/9110914#zippy=%2Cgmail-api%2Cexceptions-to-verification-requirements%2Csteps-to-prepare-for-verification%2Csteps-for-apps-requesting-sensitive-scopes%2Csteps-for-apps-requesting-restricted-scopes%2Csteps-to-submit-your-app%2Csecurity-assessment
     if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
       final provider = DesktopOAuthManager(loginProvider: LoginProviders.google);
@@ -99,21 +99,27 @@ extension LoginProviderExtension on LoginProviders {
         var emails = user['emailAddresses'] as List;
         var email = emails.firstWhere((element) => (element['metadata']['primary'] ?? false) == true)['value'];
 
-        var id = collection?.id ?? Uuid.v4().toString();
-        var root = File(RealmRepository.instance.database.config.path).parent.parent;
+        var id = collection?.id ?? const Uuid().v4().toString();
+        var root = File(DatabaseRepository.instance.database!.path!).parent.parent;
 
         // Create/Update Collection with the following bits of oauth data
         Collection c = Collection(
-            id, email, "${root.path}/files/email/$email", "email", AppConstants.scannerEmailGmail, "pending",
+            id: id,
+            name: email,
+            path: "${root.path}/files/email/$email",
+            type: "email",
+            scanner: AppConstants.scannerEmailGmail,
+            scanStatus: "pending",
             oauthService: "google",
             accessToken: client.credentials.accessToken,
             refreshToken: client.credentials.refreshToken,
             idToken: client.credentials.idToken,
             userId: userId,
-            expiration: client.credentials.expiration);
+            expiration: client.credentials.expiration,
+            needsReAuth: false);
 
         //Save collection
-        CollectionRepository(RealmRepository.instance.database).addCollection(c).then((value) {
+        CollectionRepository(DatabaseRepository.instance.database!).addCollection(c).then((value) {
           GetCollectionsService.instance.invoke(GetCollectionsServiceCommand("email")); //reload all
           //make new default selected collection
           EmailPage.selectedCollection.add(value);

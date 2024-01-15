@@ -4,7 +4,8 @@
 import 'dart:convert';
 import 'dart:io' as io;
 
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/file.dart';
+import 'package:client/models/tables/file_asset.dart';
 import 'package:client/modules/files/files_constants.dart';
 import 'package:client/modules/files/notifications/path_changed_notification.dart';
 import 'package:client/modules/files/notifications/sort_changed_notification.dart';
@@ -174,7 +175,7 @@ class _FileTable extends State<FileTable> {
                           //var msg = ScaffoldMessenger.of(context);
                           //msg.showSnackBar(SnackBar(content: Text('File download to: ${file.path}')));
                           //then open
-                          //todo: trigger open in default app
+                          // TODO: trigger open in default app
                           await OpenFilex.open(f.path);
                         }),
                     const IconButton(icon: Icon(Icons.delete), onPressed: null),
@@ -204,7 +205,7 @@ class _FileTable extends State<FileTable> {
                       ],
                     )),
                 onTap: () {
-                  //todo
+                  // TODO
                   //context.go('/files/${f.collectionId}/${f.path}');
                   //alert parent of new path, to show in breadcrumb
                   PathChangedNotification(f, sortColumn, sortAsc).dispatch(context);

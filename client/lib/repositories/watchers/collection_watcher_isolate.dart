@@ -5,16 +5,17 @@ import 'dart:isolate';
 
 import 'package:client/app_constants.dart';
 import 'package:client/app_logger.dart';
-import 'package:client/models/app_models.dart';
-import 'package:client/models/collection_model.dart';
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/email.dart';
+import 'package:client/models/tables/file.dart';
+import 'package:client/models/tables/folder.dart';
 import 'package:client/modules/email/services/email_repository.dart';
 import 'package:client/modules/files/services/utilities/exif_extractor.dart';
 import 'package:client/modules/files/services/utilities/thumbnail_generator.dart';
 import 'package:client/modules/files/services/file_system_repository.dart';
 import 'package:client/repositories/collection_repository.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:flutter/services.dart';
-import 'package:realm/realm.dart';
 
 class CollectionWatcherIsolate {
   String path;
@@ -34,32 +35,26 @@ class CollectionWatcherIsolate {
       BackgroundIsolateBinaryMessenger.ensureInitialized(token!);
     }
 
-    Configuration config = Configuration.local(
-        [Apps.schema, AppUser.schema, Collection.schema, Folder.schema, File.schema, Email.schema],
-        schemaVersion: AppConstants.schemaVersion,
-        shouldDeleteIfMigrationNeeded: AppConstants.shouldDeleteIfMigrationNeeded,
-        path: path);
+    DatabaseRepository databaseRepository = DatabaseRepository(path, AppConstants.dbFileName); //dbName
+    print("Sqlite Db initialized in local file = ${databaseRepository.database!.path}");
 
-    Realm database = Realm(config);
-    print("Realm Db initialized in watcher isolate = ${database.config.path}");
+    fileSystemRepository = FileSystemRepository(databaseRepository.database!);
+    collectionRepository = CollectionRepository(databaseRepository.database!);
+    emailRepository = EmailRepository(databaseRepository.database!);
 
-    fileSystemRepository = FileSystemRepository(database);
-    collectionRepository = CollectionRepository(database);
-    emailRepository = EmailRepository(database);
-
-    _initializeSyncWatchers(database);
+    _initializeSyncWatchers(databaseRepository.database!);
   }
 
   final AppLogger logger = AppLogger(null);
 
   //class reference to keep change listeners running
-  StreamSubscription<RealmResultsChanges>? collectionSubs;
-  StreamSubscription<RealmResultsChanges>? emailSubs;
-  StreamSubscription<RealmResultsChanges>? fileSubs;
-  StreamSubscription<RealmResultsChanges>? folderSubs;
+  StreamSubscription<List<Collection>>? collectionSubs;
+  StreamSubscription<List<Email>>? emailSubs;
+  StreamSubscription<List<File>>? fileSubs;
+  StreamSubscription<List<Folder>>? folderSubs;
 
   /// Start a realm change stream for each collection type
-  void _initializeSyncWatchers(Realm database) {
+  void _initializeSyncWatchers(AppDatabase database) {
     _watchCollections(database);
     _watchFolders(database);
     _watchFiles(database);
@@ -67,14 +62,18 @@ class CollectionWatcherIsolate {
   }
 
   /// Listen for object changes in 'Collection'
-  void _watchCollections(Realm database) {
-    collectionSubs = database.all<Collection>().changes.listen((changes) {
+  void _watchCollections(AppDatabase database) async {
+    var collections = database.select(database.collections).watch();
+
+    collectionSubs = collections.listen((changes) {
+      print(changes);
+      /** TODO
       if (changes.inserted.isNotEmpty) {
         for (var e in changes.inserted) {
           //var obj = database.all<Collection>().elementAt(e);
           //logger.d('[Collection] inserted | $obj');
           logger.d('[Collection] inserted | $e');
-          //todo sync record
+          // TODO sync record
         }
       }
       if (changes.modified.isNotEmpty) {
@@ -82,7 +81,7 @@ class CollectionWatcherIsolate {
           //var obj = database.all<Collection>().elementAt(e);
           //logger.d('[Collection] modified | $obj');
           logger.d('[Collection] modified | $e');
-          //todo sync record
+          // TODO sync record
         }
       }
       if (changes.deleted.isNotEmpty) {
@@ -90,15 +89,21 @@ class CollectionWatcherIsolate {
           //var obj = database.all<Collection>().elementAt(e);
           //logger.d('[Collection] deleted | $obj');
           logger.d('[Collection] deleted | $e');
-          //todo sync record
+          // TODO sync record
         }
       }
+       */
     });
   }
 
   /// Listen for object changes in 'Folder'
-  void _watchFolders(Realm database) {
-    folderSubs = database.all<Folder>().changes.listen((changes) {
+  void _watchFolders(AppDatabase database) {
+    var folders = database.select(database.folders).watch();
+
+    folderSubs = folders.listen((changes) {
+      print(changes);
+
+      /** TODO
       if (changes.inserted.isNotEmpty) {
         for (var idx in changes.inserted) {
           Folder f = changes.results[idx];
@@ -106,7 +111,7 @@ class CollectionWatcherIsolate {
           //var obj = database.all<Folder>().elementAt(e);
           //logger.d('[Folder] inserted | ${obj.path}');
           logger.d('[Folder] inserted | ${f.path} | ${f.collectionId}');
-          //todo sync record
+          // TODO sync record
         }
       }
       if (changes.modified.isNotEmpty) {
@@ -116,7 +121,7 @@ class CollectionWatcherIsolate {
             //var obj = database.all<Folder>().elementAt(e);
             //logger.d('[Folder] modified | ${obj.path}');
             logger.d('[Folder] modified | ${f.path} | ${f.collectionId}');
-            //todo sync record
+            // TODO sync record
           }
         }
       }
@@ -127,16 +132,21 @@ class CollectionWatcherIsolate {
             //var obj = database.all<Folder>().elementAt(e);
             //logger.d('[Folder] deleted | $obj');
             logger.d('[Folder] deleted | ${f.path} | ${f.collectionId}');
-            //todo sync record
+            // TODO sync record
           }
         }
       }
+      */
     });
   }
 
   /// Listen for object changes in 'File'
-  void _watchFiles(Realm database) {
-    fileSubs = database.all<File>().changes.listen((changes) async {
+  void _watchFiles(AppDatabase database) {
+    var files = database.select(database.files).watch();
+
+    fileSubs = files.listen((changes) {
+      print(changes);
+      /** TODO
       if (changes.inserted.isNotEmpty) {
         for (var idx in changes.inserted) {
           File file = changes.results[idx];
@@ -155,7 +165,7 @@ class CollectionWatcherIsolate {
           //var obj = database.all<File>().elementAt(e);
           //logger.d('[File] inserted | ${obj.path}');
           //logger.d('[File] inserted | ${file.path}');
-          //todo sync record
+          // TODO sync record
         }
       }
       if (changes.modified.isNotEmpty) {
@@ -165,7 +175,7 @@ class CollectionWatcherIsolate {
             //var obj = database.all<File>().elementAt(e);
             //logger.d('[File] modified | ${obj.path}');
             //logger.d('[File] modified | $file');
-            //todo sync record
+            // TODO sync record
           }
         }
       }
@@ -176,22 +186,28 @@ class CollectionWatcherIsolate {
             //var obj = database.all<File>().elementAt(e);
             //logger.d('[File] deleted | $obj');
             //logger.d('[File] deleted | $f');
-            //todo sync record
+            // TODO sync record
           }
         }
       }
+       */
     });
   }
 
   /// Listen for object changes in 'Email'
-  void _watchEmails(Realm database) {
-    emailSubs = database.all<Email>().changes.listen((changes) {
+  void _watchEmails(AppDatabase database) {
+    var emails = database.select(database.emails).watch();
+
+    emailSubs = emails.listen((changes) {
+      print(changes);
+
+      /** TODO
       if (changes.inserted.isNotEmpty) {
         for (var e in changes.inserted) {
           var obj = database.all<Email>().elementAt(e);
           //logger.d('[Email] inserted | $obj');
           //logger.d('[Email] inserted | $obj.subject');
-          //todo sync record
+          // TODO sync record
         }
       }
       if (changes.modified.isNotEmpty) {
@@ -201,7 +217,7 @@ class CollectionWatcherIsolate {
             //var obj = database.all<Email>().elementAt(e);
             //logger.d('[Email] modified | $obj');
             //logger.d('[Email] modified | $e');
-            //todo sync record
+            // TODO sync record
           }
         }
       }
@@ -212,10 +228,11 @@ class CollectionWatcherIsolate {
             //var obj = database.all<Email>().elementAt(e);
             //logger.d('[Email] deleted | $obj');
             //logger.d('[Email] deleted | $e');
-            //todo sync record
+            // TODO sync record
           }
         }
       }
+       */
     });
   }
 }

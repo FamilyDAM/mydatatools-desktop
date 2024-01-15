@@ -1,25 +1,25 @@
 import 'dart:io';
 
-import 'package:client/models/app_models.dart';
-import 'package:collection/collection.dart';
-import 'package:realm/realm.dart';
+import 'package:client/models/tables/app_user.dart';
+import 'package:client/repositories/database_repository.dart';
 
 class UserRepository {
-  final Realm database;
+  final AppDatabase database;
   UserRepository(this.database);
 
-  List<AppUser> users() {
-    return database.all<AppUser>().toList();
+  Future<List<AppUser>> users() async {
+    return await database.select(database.appUsers).get();
   }
 
-  AppUser? userExists() {
-    AppUser? user = database.all<AppUser>().firstOrNull;
+  Future<AppUser?> userExists() async {
+    AppUser? user = await database.select(database.appUsers).getSingleOrNull();
     return user;
   }
 
   /// Search for user by password that has been hashed with a PBKDF2 algorithm
-  AppUser? user(String password) {
-    AppUser? user = database.query<AppUser>("password == '$password'").firstOrNull;
+  Future<AppUser?> user(String password) async {
+    AppUser? user =
+        await (database.select(database.appUsers)..where((e) => e.password.equals(password))).getSingleOrNull();
     if (user != null) {
       String keyDir = '${user.localStoragePath}${Platform.pathSeparator}keys';
       String publicFilePath = '$keyDir/public.pem';
@@ -27,7 +27,7 @@ class UserRepository {
       if (!File(publicFilePath).existsSync() && !File(privateFilePath).existsSync()) {
         throw Exception("Keys not found, stopping application");
       }
-      //todo: read/write from app /keys folder
+      // TODO: read/write from app /keys folder
       user.publicKey = File(publicFilePath).readAsStringSync();
       user.privateKey = File(privateFilePath).readAsStringSync();
     }
@@ -46,18 +46,24 @@ class UserRepository {
       if (!Directory(keyDir).existsSync()) {
         Directory(keyDir).createSync(recursive: true);
       }
-      File(publicFilePath).writeAsStringSync(user.publicKey);
-      File(privateFilePath).writeAsStringSync(user.privateKey);
+      if (user.publicKey != null) {
+        File(publicFilePath).writeAsStringSync(user.publicKey!);
+      }
+      if (user.privateKey != null) {
+        File(privateFilePath).writeAsStringSync(user.privateKey!);
+      }
     }
 
     //FlutterSecureStorage storage = const FlutterSecureStorage();
     //await storage.write(key: AppConstants.securePassword, value: user.password);
 
-    database.write(() {
-      database.add(user, update: true);
-    });
+    int rowsUpdated = await database.into(database.appUsers).insertOnConflictUpdate(user);
 
-    //todo: register user, with only the Public Key to server
+    if (rowsUpdated == 0) {
+      throw Exception("Error saving user");
+    }
+
+    // TODO: register user, with only the Public Key to server
 
     return Future(() => user);
   }

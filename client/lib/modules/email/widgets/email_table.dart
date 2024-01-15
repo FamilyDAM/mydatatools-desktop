@@ -1,4 +1,4 @@
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/email.dart';
 import 'package:client/modules/email/notifications/email_sort_changed_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:moment_dart/moment_dart.dart';
@@ -100,11 +100,11 @@ class GridData extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     Email email = emails[index];
-    String from = email.from!.split("<")[0].trim();
+    String from = email.from.split("<")[0].trim();
     Moment moment = Moment.fromMillisecondsSinceEpoch(email.date.toUtc().millisecondsSinceEpoch, isUtc: true);
 
     return DataRow(
-        selected: email.isSelected,
+        selected: email.isSelected ?? false,
         cells: [
           DataCell(
               ConstrainedBox(

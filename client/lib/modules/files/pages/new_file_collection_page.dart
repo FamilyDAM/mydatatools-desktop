@@ -1,13 +1,14 @@
-import 'package:client/models/collection_model.dart';
+import 'package:client/app_constants.dart';
+import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/files/pages/rx_files_page.dart';
 import 'package:client/repositories/collection_repository.dart';
-import 'package:client/repositories/realm_repository.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 class NewFileCollectionPage extends StatefulWidget {
   const NewFileCollectionPage({super.key});
@@ -76,7 +77,7 @@ class _NewFileCollectionPage extends State<NewFileCollectionPage> {
                           onPressed: () async {
                             String? result = await FilePicker.platform.getDirectoryPath();
                             if (result != null) {
-                              //todo set props
+                              // TODO set props
                               // set value directly to the control
                               form.control('name').value = result.split("/").last;
                               form.control('path').value = result;
@@ -99,12 +100,18 @@ class _NewFileCollectionPage extends State<NewFileCollectionPage> {
                     children: [
                       ElevatedButton(
                           onPressed: () {
-                            //todo disable until path has been picked
+                            // TODO disable until path has been picked
                             //Create new object
-                            Collection fc = Collection(Uuid.v4().toString(), form.control('name').value,
-                                form.control('path').value, "file", "file.local", "pending");
+                            Collection fc = Collection(
+                                id: const Uuid().v4().toString(),
+                                name: form.control('name').value,
+                                path: form.control('path').value,
+                                type: "file",
+                                scanner: AppConstants.scannerFileLocal,
+                                scanStatus: "pending",
+                                needsReAuth: false);
 
-                            CollectionRepository(RealmRepository.instance.database).addCollection(fc).then((value) {
+                            CollectionRepository(DatabaseRepository.instance.database!).addCollection(fc).then((value) {
                               GetCollectionsService.instance.invoke(GetCollectionsServiceCommand(null)); //reload all
                               //make new default selected collection
                               RxFilesPage.selectedCollection.add(value);

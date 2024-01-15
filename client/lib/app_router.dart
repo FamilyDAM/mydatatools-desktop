@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:client/app_constants.dart';
-import 'package:client/models/app_models.dart' as m;
+import 'package:client/models/tables/app_user.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/modules/email/pages/new_email_page.dart';
 import 'package:client/modules/email/widgets/email_drawer.dart';
@@ -19,7 +19,6 @@ import 'package:client/pages/home.dart';
 import 'package:client/pages/login.dart';
 import 'package:client/pages/setup.dart';
 import 'package:client/repositories/database_repository.dart';
-import 'package:client/repositories/realm_repository.dart';
 import 'package:client/services/get_user_service.dart';
 import 'package:client/services/get_users_service.dart';
 import 'package:client/widgets/router/navigation_wrapper.dart';
@@ -41,7 +40,7 @@ class AppRouter {
             if (state.uri.toString() == '/setup') return null;
 
             //check app startup initialization
-            if (!RealmRepository.isInitialized) {
+            if (DatabaseRepository.instance.database == null) {
               var supportPath = await getApplicationSupportDirectory();
               supportDirectory.add(supportPath);
               bool needsSetup = await validateAppDirsAndDb(supportPath);
@@ -50,10 +49,10 @@ class AppRouter {
               }
             }
 
-            //todo: add logic to show splash screen
+            // TODO: add logic to show splash screen
 
             //check if user is logged in
-            m.AppUser? user = GetUserService.instance.sink.valueOrNull;
+            AppUser? user = GetUserService.instance.sink.valueOrNull;
             if (user == null) {
               return '/login';
             }
@@ -189,7 +188,7 @@ class AppRouter {
         print("Schema Version=${db.database!.schemaVersion}");
 
         //last check, do we have any users?
-        List<m.AppUser> users = await GetUsersService.instance.invoke(GetUsersServiceCommand());
+        List<AppUser> users = await GetUsersService.instance.invoke(GetUsersServiceCommand());
         if (users.isEmpty) {
           return true; //Needs Setup
         }

@@ -2,7 +2,7 @@ import 'package:client/app_logger.dart';
 import 'package:flutter/material.dart';
 
 class StatusMessage extends StatelessWidget {
-  const StatusMessage({Key? key}) : super(key: key);
+  const StatusMessage({super.key});
 
   @override
   Widget build(BuildContext context) {

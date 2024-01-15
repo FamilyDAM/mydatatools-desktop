@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:client/app_router.dart';
-import 'package:client/models/app_models.dart';
+import 'package:client/models/tables/app_user.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';

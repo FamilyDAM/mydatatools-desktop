@@ -18,7 +18,7 @@ class GoogleAuthClient extends http.BaseClient {
   }
 
   static Future<String> validateToken(String accessToken, String refreshToken) async {
-    //todo: call Google and refresh the token
+    // TODO: call Google and refresh the token
     return await _refreshToken(accessToken, refreshToken);
   }
 
@@ -44,12 +44,12 @@ class GoogleAuthClient extends http.BaseClient {
 
     var body = jsonDecode(response.body);
     if (body['access_token'] != null) {
-      //todo save access token to db
+      // TODO save access token to db
       return body['access_token'];
     } else {
       AppLogger(null).e('${body['error_description']}');
       throw Exception(body['error_description']);
-      //todo: flip flag on collection, show warning in UI asking user to reauth acccount.
+      // TODO: flip flag on collection, show warning in UI asking user to reauth acccount.
     }
   }
 

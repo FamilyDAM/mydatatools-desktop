@@ -10,7 +10,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:password_dart/password_dart.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key, this.onLoginSuccessful}) : super(key: key);
+  const LoginForm({super.key, this.onLoginSuccessful});
   final VoidCallback? onLoginSuccessful;
 
   @override
@@ -54,7 +54,7 @@ class _LoginFormState extends State<LoginForm> {
             surfaceTintColor: Colors.white70,
             child: Column(children: [
               const SizedBox(height: 64),
-              //todo add padding
+              // TODO add padding
               Container(
                   padding: const EdgeInsets.all(16),
                   child: FormBuilder(

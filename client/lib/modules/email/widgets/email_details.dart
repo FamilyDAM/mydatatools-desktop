@@ -1,4 +1,4 @@
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/email.dart';
 import 'package:flutter/material.dart';
 
 class EmailDetails extends StatefulWidget {

@@ -1,7 +1,7 @@
-import 'package:client/models/collection_model.dart';
+import 'package:client/models/tables/collection.dart';
 import 'package:client/scanners/collection_scanner.dart';
 
-//todo
+// TODO
 //@see https://pub.dev/packages/driven
 class GoogleFileScanner implements CollectionScanner {
   final String path;

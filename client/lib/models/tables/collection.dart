@@ -1,7 +1,7 @@
 import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
 
-part 'collection.g.dart';
+//part 'collection.g.dart';
 
 @UseRowClass(Collection, constructor: 'fromDb')
 @TableIndex(name: 'collections_id_idx', columns: {#id})

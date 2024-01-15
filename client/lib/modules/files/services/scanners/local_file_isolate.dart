@@ -3,15 +3,14 @@ import 'dart:io' as io;
 import 'dart:isolate';
 import 'dart:math';
 
+import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/file.dart';
+import 'package:client/models/tables/folder.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:flutter/services.dart';
-import 'package:realm/realm.dart';
 import 'package:client/app_constants.dart';
 import 'package:client/app_logger.dart';
-import 'package:client/models/app_models.dart';
-import 'package:client/models/collection_model.dart';
-import 'package:client/models/module_models.dart';
 import 'package:client/modules/files/files_constants.dart';
-import 'package:client/models/module_models.dart' as models;
 import 'package:client/modules/files/services/file_system_repository.dart';
 
 class LocalFileIsolate {
@@ -88,7 +87,7 @@ class LocalFileIsolate {
     Isolate.exit(resultPort, fileCount);
   }
 
-  Future<int> _scanDir(Realm database, SendPort resultPort, String collectionId, String path, recursive) async {
+  Future<int> _scanDir(AppDatabase database, SendPort resultPort, String collectionId, String path, recursive) async {
     int count = 0;
     var dir = io.Directory(path);
     List<io.FileSystemEntity> files = [];
@@ -123,33 +122,30 @@ class LocalFileIsolate {
     return Future(() => count);
   }
 
-  Realm _initDatabase(String path_) {
-    Configuration config = Configuration.local(
-        [Apps.schema, AppUser.schema, Collection.schema, Folder.schema, File.schema, Email.schema],
-        schemaVersion: AppConstants.schemaVersion,
-        shouldDeleteIfMigrationNeeded: AppConstants.shouldDeleteIfMigrationNeeded,
-        path: path_);
+  AppDatabase _initDatabase(String path_) {
+    DatabaseRepository databaseRepository = DatabaseRepository(path_, AppConstants.dbFileName); //dbName
 
-    Realm database = Realm(config);
-    print("Realm Db initialized in local file isolate = ${database.config.path}");
-    return database;
+    print("Sqlite Db initialized in local file = ${databaseRepository.database!.path}");
+
+    return databaseRepository.database!;
   }
 
-  Future<int> _saveResults(Realm database, String collectionId, List<io.FileSystemEntity> files, String parent) async {
+  Future<int> _saveResults(
+      AppDatabase database, String collectionId, List<io.FileSystemEntity> files, String parent) async {
     int batchFolderSize = 100;
     int batchFileSize = 100;
     int count = 0;
     //create repository & load list of all existing files
     FileSystemRepository repo = FileSystemRepository(database);
     Map<String, DateTime> existingFolders = {};
-    repo.folders(collectionId, parent).forEach((e) {
-      existingFolders.putIfAbsent('${e.collectionId}:${e.path}', () => e.lastModified);
-    });
+    for (var e in (await repo.folders(collectionId, parent))) {
+      existingFolders.putIfAbsent('${e.collectionId}:${e.path}', () => e.dateLastModified);
+    }
 
     Map<String, DateTime> existingFiles = {};
-    repo.files(collectionId, parent).forEach((e) {
-      existingFiles.putIfAbsent('${e.collectionId}:${e.path}', () => e.lastModified);
-    });
+    for (var e in (await repo.files(collectionId, parent))) {
+      existingFiles.putIfAbsent('${e.collectionId}:${e.path}', () => e.dateLastModified);
+    }
 
     //First Save all the Directories
     List<io.Directory> dirList = files.whereType<io.Directory>().toList();
@@ -210,11 +206,11 @@ class LocalFileIsolate {
 
   /// Validate directories against the know paths we want to skip.
   /// Convert dart.io to a local model object
-  Future<List<models.Folder>> _validateFolders(
+  Future<List<Folder>> _validateFolders(
       Map<String, DateTime> existingFolders, String collectionId, List<io.Directory> dirs) {
     final hiddenFolderRegex = RegExp('/[.].*/?', multiLine: false, caseSensitive: true, unicode: true);
 
-    //todo: add this list to a global config / UI page
+    // TODO: add this list to a global config / UI page
     final skipFolderRegex =
         RegExp('/(go|node_modules|Pods|.git)+/?', multiLine: false, caseSensitive: true, unicode: true);
 
@@ -227,18 +223,24 @@ class LocalFileIsolate {
 
     //List<String> paths = cleanList.map((e) => e.path).toList();
 
-    //todo remove deleted folders
+    // TODO remove deleted folders
     //await fileService.folderRepository.deleteFolders(collectionId, parentPath, paths);
 
-    List<models.Folder> newFolders = [];
+    List<Folder> newFolders = [];
     for (var d in cleanList) {
       if (existingFolders["$collectionId:${d.path}"] == null) {
         String name = d.path.split("/").last;
         String parentPath = d.path.split("/").sublist(0, d.path.split("/").length - 1).join("/");
 
-        //todo: get date created/modified from file system
-        newFolders.add(models.Folder('$collectionId:${d.path.hashCode}', name, d.path, parentPath, DateTime.now(),
-            DateTime.now(), collectionId));
+        // TODO: get date created/modified from file system
+        newFolders.add(Folder(
+            id: '$collectionId:${d.path.hashCode}',
+            name: name,
+            path: d.path,
+            parent: parentPath,
+            dateCreated: DateTime.now(),
+            dateLastModified: DateTime.now(),
+            collectionId: collectionId));
       }
     }
 
@@ -251,7 +253,7 @@ class LocalFileIsolate {
       Map<String, DateTime> existingFiles, String collectionId, List<io.File> files) async {
     final hiddenFolderRegex = RegExp('/[.].*/?', multiLine: false, caseSensitive: true, unicode: true);
 
-    //todo: add this list to a global config / UI page
+    // TODO: add this list to a global config / UI page
     final skipFolderRegex =
         RegExp('/(go|node_modules|Pods|.git)+/?', multiLine: false, caseSensitive: true, unicode: true);
 
@@ -265,7 +267,7 @@ class LocalFileIsolate {
     //list of good paths
     //List<String> paths = cleanList.map((e) => e.path).toList();
 
-    //todo remove deleted files
+    // TODO remove deleted files
     //await fileService.fileRepository.deleteFiles(collectionId, parentPath, paths);
 
     List<File> newFiles = [];
@@ -274,8 +276,17 @@ class LocalFileIsolate {
         String name = d.path.split("/").last;
         String parentPath = d.path.split("/").sublist(0, d.path.split("/").length - 1).join("/");
         DateTime lmDate = d.lastModifiedSync();
-        newFiles.add(models.File('$collectionId:${d.path.hashCode}', collectionId, name, d.path, parentPath, lmDate,
-            lmDate, d.lengthSync(), getMimeType(name)));
+        newFiles.add(File(
+            id: '$collectionId:${d.path.hashCode}',
+            collectionId: collectionId,
+            name: name,
+            path: d.path,
+            parent: parentPath,
+            dateCreated: lmDate,
+            dateLastModified: lmDate,
+            isDeleted: false,
+            size: d.lengthSync(),
+            contentType: getMimeType(name)));
       }
     }
 
@@ -308,7 +319,7 @@ class LocalFileIsolate {
 }
 
 
-/** todo map extra types and move to helper class
+/** TODO map extra types and move to helper class
     {
     {".3gp",    "video/3gpp"},
     {".torrent","application/x-bittorrent"},

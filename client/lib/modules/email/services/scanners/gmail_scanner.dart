@@ -1,12 +1,12 @@
 import 'dart:isolate';
 
 import 'package:client/app_logger.dart';
-import 'package:client/models/collection_model.dart';
+import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/email/services/scanners/gmail_scanner_isolate.dart';
 import 'package:client/scanners/collection_scanner.dart';
 import 'package:flutter/services.dart';
 
-//todo
+// TODO
 //@see https://pub.dev/packages/driven
 class GmailScanner implements CollectionScanner {
   String dbPath;
@@ -23,7 +23,7 @@ class GmailScanner implements CollectionScanner {
   Future<int> start(Collection collection, String? path, bool recursive, bool force) async {
     // check if scan has already been run once
     if (!force && collection.lastScanDate != null) return Future(() => 0);
-    //todo: add a date range check to rerun scan
+    // TODO: add a date range check to rerun scan
 
     //start full scan in isolate
     ReceivePort receivePort = ReceivePort();

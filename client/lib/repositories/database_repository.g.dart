@@ -1351,6 +1351,39 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
   late final GeneratedColumn<String> contentType = GeneratedColumn<String>(
       'content_type', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sizeMeta = const VerificationMeta('size');
+  @override
+  late final GeneratedColumn<int> size = GeneratedColumn<int>(
+      'size', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _isDeletedMeta =
+      const VerificationMeta('isDeleted');
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+      'is_deleted', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_deleted" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _thumbnailMeta =
+      const VerificationMeta('thumbnail');
+  @override
+  late final GeneratedColumn<String> thumbnail = GeneratedColumn<String>(
+      'thumbnail', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _latitudeMeta =
+      const VerificationMeta('latitude');
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+      'latitude', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _longitudeMeta =
+      const VerificationMeta('longitude');
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+      'longitude', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1360,7 +1393,12 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
         dateCreated,
         dateLastModified,
         collectionId,
-        contentType
+        contentType,
+        size,
+        isDeleted,
+        thumbnail,
+        latitude,
+        longitude
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1427,6 +1465,28 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
     } else if (isInserting) {
       context.missing(_contentTypeMeta);
     }
+    if (data.containsKey('size')) {
+      context.handle(
+          _sizeMeta, size.isAcceptableOrUnknown(data['size']!, _sizeMeta));
+    } else if (isInserting) {
+      context.missing(_sizeMeta);
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(_isDeletedMeta,
+          isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta));
+    }
+    if (data.containsKey('thumbnail')) {
+      context.handle(_thumbnailMeta,
+          thumbnail.isAcceptableOrUnknown(data['thumbnail']!, _thumbnailMeta));
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(_latitudeMeta,
+          latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta));
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(_longitudeMeta,
+          longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
+    }
     return context;
   }
 
@@ -1452,6 +1512,16 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
           .read(DriftSqlType.string, data['${effectivePrefix}collection_id'])!,
       contentType: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}content_type'])!,
+      size: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}size'])!,
+      isDeleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
+      thumbnail: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}thumbnail']),
+      latitude: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}latitude']),
+      longitude: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}longitude']),
     );
   }
 
@@ -1470,6 +1540,11 @@ class FilesCompanion extends UpdateCompanion<File> {
   final Value<DateTime> dateLastModified;
   final Value<String> collectionId;
   final Value<String> contentType;
+  final Value<int> size;
+  final Value<bool> isDeleted;
+  final Value<String?> thumbnail;
+  final Value<double?> latitude;
+  final Value<double?> longitude;
   final Value<int> rowid;
   const FilesCompanion({
     this.id = const Value.absent(),
@@ -1480,6 +1555,11 @@ class FilesCompanion extends UpdateCompanion<File> {
     this.dateLastModified = const Value.absent(),
     this.collectionId = const Value.absent(),
     this.contentType = const Value.absent(),
+    this.size = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.thumbnail = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   FilesCompanion.insert({
@@ -1491,6 +1571,11 @@ class FilesCompanion extends UpdateCompanion<File> {
     required DateTime dateLastModified,
     required String collectionId,
     required String contentType,
+    required int size,
+    this.isDeleted = const Value.absent(),
+    this.thumbnail = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         name = Value(name),
@@ -1499,7 +1584,8 @@ class FilesCompanion extends UpdateCompanion<File> {
         dateCreated = Value(dateCreated),
         dateLastModified = Value(dateLastModified),
         collectionId = Value(collectionId),
-        contentType = Value(contentType);
+        contentType = Value(contentType),
+        size = Value(size);
   static Insertable<File> custom({
     Expression<String>? id,
     Expression<String>? name,
@@ -1509,6 +1595,11 @@ class FilesCompanion extends UpdateCompanion<File> {
     Expression<DateTime>? dateLastModified,
     Expression<String>? collectionId,
     Expression<String>? contentType,
+    Expression<int>? size,
+    Expression<bool>? isDeleted,
+    Expression<String>? thumbnail,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1520,6 +1611,11 @@ class FilesCompanion extends UpdateCompanion<File> {
       if (dateLastModified != null) 'date_last_modified': dateLastModified,
       if (collectionId != null) 'collection_id': collectionId,
       if (contentType != null) 'content_type': contentType,
+      if (size != null) 'size': size,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (thumbnail != null) 'thumbnail': thumbnail,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1533,6 +1629,11 @@ class FilesCompanion extends UpdateCompanion<File> {
       Value<DateTime>? dateLastModified,
       Value<String>? collectionId,
       Value<String>? contentType,
+      Value<int>? size,
+      Value<bool>? isDeleted,
+      Value<String?>? thumbnail,
+      Value<double?>? latitude,
+      Value<double?>? longitude,
       Value<int>? rowid}) {
     return FilesCompanion(
       id: id ?? this.id,
@@ -1543,6 +1644,11 @@ class FilesCompanion extends UpdateCompanion<File> {
       dateLastModified: dateLastModified ?? this.dateLastModified,
       collectionId: collectionId ?? this.collectionId,
       contentType: contentType ?? this.contentType,
+      size: size ?? this.size,
+      isDeleted: isDeleted ?? this.isDeleted,
+      thumbnail: thumbnail ?? this.thumbnail,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1574,6 +1680,21 @@ class FilesCompanion extends UpdateCompanion<File> {
     if (contentType.present) {
       map['content_type'] = Variable<String>(contentType.value);
     }
+    if (size.present) {
+      map['size'] = Variable<int>(size.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (thumbnail.present) {
+      map['thumbnail'] = Variable<String>(thumbnail.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1591,6 +1712,11 @@ class FilesCompanion extends UpdateCompanion<File> {
           ..write('dateLastModified: $dateLastModified, ')
           ..write('collectionId: $collectionId, ')
           ..write('contentType: $contentType, ')
+          ..write('size: $size, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('thumbnail: $thumbnail, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1919,9 +2045,3 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         folderCollectionIdIdx
       ];
 }
-
-// **************************************************************************
-// RealmObjectGenerator
-// **************************************************************************
-
-// ignore_for_file: type=lint

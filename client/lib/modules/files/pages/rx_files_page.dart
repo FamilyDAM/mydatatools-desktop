@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:client/app_logger.dart';
-import 'package:client/models/collection_model.dart';
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/file.dart';
+import 'package:client/models/tables/file_asset.dart';
+import 'package:client/models/tables/folder.dart';
 import 'package:client/modules/files/notifications/file_notification.dart';
 import 'package:client/modules/files/notifications/path_changed_notification.dart';
 import 'package:client/modules/files/notifications/sort_changed_notification.dart';
@@ -121,7 +123,7 @@ class _RxFilesPage extends State<RxFilesPage> {
               },
             ),
             IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: const Icon(Icons.download, color: Colors.black),
               tooltip: 'Download File(s)',
               onPressed: () {
@@ -130,7 +132,7 @@ class _RxFilesPage extends State<RxFilesPage> {
               },
             ),
             IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: const Icon(Icons.refresh, color: Colors.black),
               tooltip: 'Refresh',
               onPressed: () {
@@ -144,7 +146,7 @@ class _RxFilesPage extends State<RxFilesPage> {
               },
             ),
             IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: const Icon(Icons.delete, color: Colors.black),
               tooltip: 'Delete File(s)',
               onPressed: () {
@@ -232,7 +234,7 @@ class _RxFilesPage extends State<RxFilesPage> {
                 path = p;
                 _filesAndFoldersService!.invoke(GetFileServiceCommand(collection, path));
               });
-        }).toList()
+        })
       ],
       divider: const Icon(
         Icons.chevron_right,

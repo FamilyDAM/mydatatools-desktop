@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:client/models/collection_model.dart';
+import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:flutter/material.dart';

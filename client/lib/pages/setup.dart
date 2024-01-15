@@ -2,7 +2,7 @@ import 'package:client/widgets/setup/setup_stepper_form.dart';
 import 'package:flutter/material.dart';
 
 class SetupPage extends StatelessWidget {
-  const SetupPage({Key? key}) : super(key: key);
+  const SetupPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +22,7 @@ void main() {
       //https://github.com/flutter/flutter/issues/10912#issuecomment-587403632
       TestWidgetsFlutterBinding.ensureInitialized();
       const MethodChannel channel = MethodChannel('plugins.flutter.io/path_provider');
+      // ignore: deprecated_member_use
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
         return ".";
       });
@@ -59,13 +60,13 @@ void main() {
 
     test("Delete Folder", () async {
       m.Folder folder = m.Folder(
-        id: Uuid.v4().toString(),
+        id: const Uuid().v4().toString(),
         name: "Files",
         path: "/files",
         parent: "/",
         dateCreated: DateTime.now().subtract(const Duration(days: 1)),
         dateLastModified: DateTime.now(),
-        collectionId: Uuid.v4().toString(),
+        collectionId: const Uuid().v4().toString(),
       );
       var db = databaseRepository.database!;
       await db.into(db.folders).insert(folder);
@@ -81,13 +82,13 @@ void main() {
 
     test("check all properties are saved", () async {
       m.Folder folder = m.Folder(
-        id: Uuid.v4().toString(),
+        id: const Uuid().v4().toString(),
         name: "Files",
         path: "/files",
         parent: "/",
         dateCreated: DateTime.now().subtract(const Duration(days: 1)),
         dateLastModified: DateTime.now(),
-        collectionId: Uuid.v4().toString(),
+        collectionId: const Uuid().v4().toString(),
       );
 
       var db = databaseRepository.database!;
@@ -106,31 +107,31 @@ void main() {
 
     test("Insert multiple folders", () async {
       m.Folder folder1 = m.Folder(
-        id: Uuid.v4().toString(),
+        id: const Uuid().v4().toString(),
         name: "Files",
         path: "/files",
         parent: "/",
         dateCreated: DateTime.now().subtract(const Duration(days: 1)),
         dateLastModified: DateTime.now(),
-        collectionId: Uuid.v4().toString(),
+        collectionId: const Uuid().v4().toString(),
       );
       m.Folder folder2 = m.Folder(
-        id: Uuid.v4().toString(),
+        id: const Uuid().v4().toString(),
         name: "Files",
         path: "/files",
         parent: "/",
         dateCreated: DateTime.now().subtract(const Duration(days: 1)),
         dateLastModified: DateTime.now(),
-        collectionId: Uuid.v4().toString(),
+        collectionId: const Uuid().v4().toString(),
       );
       m.Folder folder3 = m.Folder(
-        id: Uuid.v4().toString(),
+        id: const Uuid().v4().toString(),
         name: "Files",
         path: "/files",
         parent: "/",
         dateCreated: DateTime.now().subtract(const Duration(days: 1)),
         dateLastModified: DateTime.now(),
-        collectionId: Uuid.v4().toString(),
+        collectionId: const Uuid().v4().toString(),
       );
 
       var db = databaseRepository.database!;

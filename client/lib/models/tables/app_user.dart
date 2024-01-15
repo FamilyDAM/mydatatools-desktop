@@ -1,7 +1,7 @@
 import 'package:client/repositories/database_repository.dart';
 import 'package:drift/drift.dart';
 
-part 'app_user.g.dart';
+//part 'app_user.g.dart';
 
 @UseRowClass(AppUser, constructor: 'fromDb')
 class AppUsers extends Table {

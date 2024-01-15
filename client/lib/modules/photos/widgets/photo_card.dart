@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io' as io;
 
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/file.dart';
 import 'package:flutter/material.dart';
 import 'package:progressive_image/progressive_image.dart';
 
 class PhotoCard extends StatefulWidget {
-  const PhotoCard({Key? key, required this.file, required this.width}) : super(key: key);
+  const PhotoCard({super.key, required this.file, required this.width});
 
   final File file;
   final double width;

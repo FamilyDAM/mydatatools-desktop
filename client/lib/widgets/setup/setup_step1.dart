@@ -1,11 +1,11 @@
-import 'package:client/models/app_models.dart';
+import 'package:client/models/tables/app_user.dart';
 import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:realm/realm.dart';
 import 'package:password_dart/password_dart.dart';
+import 'package:uuid/uuid.dart';
 
 class SetupStep1 extends StatelessWidget {
-  SetupStep1({Key? key, required this.onCancel, required this.onSubmit}) : super(key: key);
+  SetupStep1({super.key, required this.onCancel, required this.onSubmit});
 
   final VoidCallback onCancel;
   final void Function(AppUser) onSubmit;
@@ -40,12 +40,13 @@ class SetupStep1 extends StatelessWidget {
           throw Exception('Password hash failed');
         }
 
-        //todo verify this can be used on server (node & java services)
+        // TODO verify this can be used on server (node & java services)
         //for server side (java) version
         //see https://howtodoinjava.com/java/java-security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
 
         //password is a must have required field
-        AppUser appUser = AppUser(Uuid.v4().toString(), name, email, hash, '');
+        AppUser appUser =
+            AppUser(id: const Uuid().v4().toString(), name: name, email: email, password: hash, localStoragePath: '');
 
         //call callback and proceed to next step
         onSubmit(appUser);

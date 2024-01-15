@@ -1,5 +1,5 @@
 import 'dart:io' as io;
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/file.dart';
 import 'package:client/modules/files/files_constants.dart';
 import 'package:exif/exif.dart';
 

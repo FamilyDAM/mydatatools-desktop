@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:client/models/collection_model.dart';
-import 'package:client/modules/email/services/scanners/gmail_scanner.dart';
-import 'package:client/modules/files/services/scanners/local_file_scanner.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:client/scanners/collection_scanner.dart';
 import 'package:logger/logger.dart';
-import 'package:realm/realm.dart';
 
 class ScannerManager {
   final Logger logger = Logger();
@@ -14,12 +11,12 @@ class ScannerManager {
   List<Collection> collections = [];
   Map<String, CollectionScanner> scanners = {};
 
-  late Realm database;
+  late AppDatabase database;
   //class reference to keep change listeners running
-  StreamSubscription<RealmResultsChanges>? collectionSubs;
+  StreamSubscription<List<Collection>>? collectionSubs;
 
-  factory ScannerManager(Realm realm) {
-    _instance.database = realm;
+  factory ScannerManager(AppDatabase database) {
+    _instance.database = database;
     _instance.startScanners();
     return _instance;
   }
@@ -33,17 +30,22 @@ class ScannerManager {
     //_instance.startScanners();
   }
 
-  void startScanners() {
+  void startScanners() async {
     //start scanner for all existing collections
-    var collections = database.all<Collection>().toList();
+    var collections = await database.select(database.collections).get();
     for (var c in collections) {
       logger.d('${c.id} | ${c.path}');
       _registerSingleScanner(c);
     }
 
     //listend for new collections and add them at runtime
-    collectionSubs = database.all<Collection>().changes.listen((changes) {
-      //start scanners for new collections
+    Stream<List<Collection>> collectionWatch = database.select(database.collections).watch();
+
+    collectionWatch.listen((changes) {
+      print('Value from controller: $changes');
+
+      /// TODO
+      /**
       if (changes.inserted.isNotEmpty) {
         for (var indx in changes.inserted) {
           //add collection to scanner manager
@@ -53,8 +55,8 @@ class ScannerManager {
       }
 
       if (changes.deleted.isNotEmpty) {
-        //todo, stop scanner
-      }
+        // TODO, stop scanner
+      } */
     });
   }
 
@@ -70,7 +72,7 @@ class ScannerManager {
   }
 
   void startScanner(Collection c) {
-    //todo, not implemented yet
+    // TODO, not implemented yet
   }
 
   CollectionScanner? getScanner(Collection c) {
@@ -79,6 +81,7 @@ class ScannerManager {
 
   void _registerSingleScanner(Collection c) {
     //go up 2 folders from db folder
+    /** TODO: implement this with sqlite
     Directory appDir = Directory(database.config.path);
     Directory fileDir = appDir.parent.parent;
 
@@ -98,5 +101,6 @@ class ScannerManager {
       default:
         break;
     }
+     */
   }
 }

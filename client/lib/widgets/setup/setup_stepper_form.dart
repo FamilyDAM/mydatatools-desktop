@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:client/app_constants.dart';
 import 'package:client/app_router.dart';
-import 'package:client/models/app_models.dart';
-import 'package:client/repositories/realm_repository.dart';
+import 'package:client/models/tables/app_user.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:client/repositories/user_repository.dart';
 import 'package:client/services/get_user_service.dart';
 import 'package:client/widgets/setup/setup_step1.dart';
@@ -17,7 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 
 class SetupStepperForm extends StatefulWidget {
-  const SetupStepperForm({Key? key}) : super(key: key);
+  const SetupStepperForm({super.key});
 
   @override
   State<SetupStepperForm> createState() => _SetupStepperFormState();
@@ -67,7 +67,7 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
         setState(() {
           currentStep = 1;
         });
-      } else if (appUser!.publicKey.isEmpty || appUser!.privateKey.isEmpty) {
+      } else if (appUser!.publicKey == null || appUser!.privateKey == null) {
         setState(() {
           currentStep = 2;
         });
@@ -78,12 +78,17 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
       var jsonConfig = jsonEncode(config);
       File('$supportDir${Platform.pathSeparator}${AppConstants.configFileName}').writeAsStringSync(jsonConfig);
 
-      //initialize empty Realm database in the user defined directory
-      RealmRepository(supportDir);
-      UserRepository userRepository = UserRepository(RealmRepository.instance.database);
+      //initialize empty database in the user defined directory
+      DatabaseRepository(supportDir, AppConstants.dbFileName);
+      UserRepository userRepository = UserRepository(DatabaseRepository.instance.database!);
 
-      //Create new instance so Realm doesn't think it's managed by another instance
-      AppUser u = AppUser(appUser!.id, appUser!.name, appUser!.email, appUser!.password, appUser!.localStoragePath);
+      //Create new instance of User
+      AppUser u = AppUser(
+          id: appUser!.id,
+          name: appUser!.name,
+          email: appUser!.email,
+          password: appUser!.password,
+          localStoragePath: appUser!.localStoragePath);
       u.privateKey = appUser!.privateKey;
       u.publicKey = appUser!.publicKey;
 
@@ -96,7 +101,7 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
             GoRouter.of(context).go("/");
           }
         } else {
-          //todo: do something on save
+          // TODO: do something on save
         }
       }).catchError(
         (error) {

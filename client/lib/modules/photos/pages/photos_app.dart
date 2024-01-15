@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:core';
 
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/file.dart';
 import 'package:client/modules/photos/services/photos_by_date_service.dart';
 import 'package:client/modules/photos/widgets/photo_card.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +65,7 @@ class _PhotosApp extends State<PhotosApp> {
           title: const Text("My Photos"),
           actions: <Widget>[
             IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: const Icon(Icons.filter_list, color: Colors.black),
               tooltip: 'Download File(s)',
               onPressed: () {
@@ -73,7 +73,7 @@ class _PhotosApp extends State<PhotosApp> {
               },
             ),
             IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: const Icon(Icons.search, color: Colors.black),
               tooltip: 'Delete File(s)',
               onPressed: () {

@@ -1,4 +1,4 @@
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/file_asset.dart';
 import 'package:client/modules/files/notifications/file_notification.dart';
 
 class PathChangedNotification extends FiledNotification {

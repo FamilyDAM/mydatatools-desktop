@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:client/app_logger.dart';
-import 'package:client/models/collection_model.dart';
-import 'package:client/models/module_models.dart';
+import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/email.dart';
 import 'package:client/modules/email/notifications/email_sort_changed_notification.dart';
 import 'package:client/modules/email/pages/new_email_page.dart';
 import 'package:client/modules/email/services/email_service.dart';
@@ -105,7 +105,7 @@ class _EmailPage extends State<EmailPage> {
           title: Text(collection?.name ?? ''),
           actions: <Widget>[
             IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: const Icon(Icons.search, color: Colors.black),
               tooltip: 'Search Emails',
               onPressed: () {
@@ -121,7 +121,7 @@ class _EmailPage extends State<EmailPage> {
               },
             ),
             IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: const Icon(Icons.delete, color: Colors.black),
               tooltip: 'Delete Selected Messages',
               onPressed: () {
@@ -130,7 +130,7 @@ class _EmailPage extends State<EmailPage> {
               },
             ),
             IconButton(
-                //todo: disable is no files are checked
+                // TODO: disable is no files are checked
                 icon: const Icon(Icons.vertical_split, color: Colors.black),
                 tooltip: 'Vertical layout',
                 onPressed: (emailLayout == 'vertical')
@@ -141,7 +141,7 @@ class _EmailPage extends State<EmailPage> {
                         });
                       }),
             IconButton(
-                //todo: disable is no files are checked
+                // TODO: disable is no files are checked
                 icon: const Icon(Icons.horizontal_split, color: Colors.black),
                 tooltip: 'Side by Side Layout',
                 onPressed: (emailLayout == 'horizontal')
@@ -152,7 +152,7 @@ class _EmailPage extends State<EmailPage> {
                         });
                       }),
             const IconButton(
-              //todo: disable is no files are checked
+              // TODO: disable is no files are checked
               icon: Icon(Icons.settings, color: Colors.black),
               tooltip: 'Collection Settings',
               onPressed: null,

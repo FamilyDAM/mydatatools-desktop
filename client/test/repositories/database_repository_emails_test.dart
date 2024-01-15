@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +22,7 @@ void main() {
       //https://github.com/flutter/flutter/issues/10912#issuecomment-587403632
       TestWidgetsFlutterBinding.ensureInitialized();
       const MethodChannel channel = MethodChannel('plugins.flutter.io/path_provider');
+      // ignore: deprecated_member_use
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
         return ".";
       });
@@ -58,8 +59,8 @@ void main() {
 
     test("Delete Email", () async {
       m.Email email = m.Email(
-          id: Uuid.v4().toString(),
-          collectionId: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
+          collectionId: const Uuid().v4().toString(),
           date: DateTime.now(),
           from: 'blah@blah.com',
           to: ['foo@foo.com'],
@@ -79,8 +80,8 @@ void main() {
 
     test("check all properties are saved", () async {
       m.Email email = m.Email(
-          id: Uuid.v4().toString(),
-          collectionId: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
+          collectionId: const Uuid().v4().toString(),
           date: DateTime.now(),
           from: 'blah@blah.com',
           to: ['foo-a@foo.com', 'foo-b@foo.com'],
@@ -108,24 +109,24 @@ void main() {
 
     test("Insert multiple files", () async {
       m.Email email1 = m.Email(
-          id: Uuid.v4().toString(),
-          collectionId: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
+          collectionId: const Uuid().v4().toString(),
           date: DateTime.now(),
           from: 'blah@blah.com',
           to: ['foo@foo.com'],
           subject: "test email",
           isDeleted: false);
       m.Email email2 = m.Email(
-          id: Uuid.v4().toString(),
-          collectionId: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
+          collectionId: const Uuid().v4().toString(),
           date: DateTime.now(),
           from: 'blah@blah.com',
           to: ['foo@foo.com'],
           subject: "test email",
           isDeleted: false);
       m.Email email3 = m.Email(
-          id: Uuid.v4().toString(),
-          collectionId: Uuid.v4().toString(),
+          id: const Uuid().v4().toString(),
+          collectionId: const Uuid().v4().toString(),
           date: DateTime.now(),
           from: 'blah@blah.com',
           to: ['foo@foo.com'],

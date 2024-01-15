@@ -1,53 +1,67 @@
-import 'package:client/models/module_models.dart';
-import 'package:collection/collection.dart';
-import 'package:realm/realm.dart';
+import 'package:client/models/tables/email.dart';
+import 'package:client/repositories/database_repository.dart';
+import 'package:drift/drift.dart';
 
 class EmailRepository {
-  final Realm database;
+  final AppDatabase database;
   EmailRepository(this.database);
 
-  List<Email> emails(String collectionId, String? sortColumn, bool? sortAsc) {
+  Future<List<Email>> emails(String collectionId, String? sortColumn, bool? sortAsc) async {
     sortColumn ??= "date";
     sortAsc ??= false;
-    var sortDirection = sortAsc ? 'asc' : 'desc';
-    //todo: add collectionId to filter
-    return database.query<Email>("collectionId = '$collectionId' SORT($sortColumn $sortDirection)").toList();
+    //var sortDirection = sortAsc ? 'asc' : 'desc';
+    // TODO: add collectionId to filter
+    return await (database.select(database.emails)..where((e) => e.collectionId.equals(collectionId))).get();
+
+    // TODO: add sort SORT($sortColumn $sortDirection)
   }
 
-  int emailCount(String collectionId) {
-    //todo: add collectionId to filter
-    return database.query<Email>("collectionId = '$collectionId'").length;
+  Future<int> emailCount(String collectionId) async {
+    // TODO: add collectionId to filter
+    return await database
+        .customSelect(
+          'SELECT COUNT(*) AS c FROM emails WHERE collectionId = ?',
+          variables: [Variable.withString(collectionId)],
+          readsFrom: {database.emails},
+        )
+        .map((row) => row.read<int>('c'))
+        .getSingle();
   }
 
-  DateTime? getMinEmailDate(String collectionId) {
-    Email? email = database.query<Email>("collectionId = '$collectionId' SORT(date asc)").firstOrNull;
+  Future<DateTime?> getMinEmailDate(String collectionId) async {
+    Email? email =
+        await (database.select(database.emails)..where((e) => e.collectionId.equals(collectionId))).getSingleOrNull();
     return email?.date;
+    // TODO add sort  SORT(date asc)
   }
 
-  DateTime? getMaxEmailDate(String collectionId) {
-    Email? email = database.query<Email>("collectionId = '$collectionId' SORT(date desc)").firstOrNull;
+  Future<DateTime?> getMaxEmailDate(String collectionId) async {
+    Email? email =
+        await (database.select(database.emails)..where((e) => e.collectionId.equals(collectionId))).getSingleOrNull();
     return email?.date;
+    // TODO: add sort SORT(date desc);
   }
 
-  List<Email> getAllById(List<String> ids) {
+  Future<List<Email>> getAllById(List<String> ids) async {
     List<Email> emails = [];
     if (ids.isNotEmpty) {
-      emails = database.query<Email>("id == \$0", ids).toList();
+      emails = await (database.select(database.emails)..where((e) => e.id.isIn(ids))).get();
     }
 
     return emails;
   }
 
-  void addEmails(String collectionId, List<Email> emails) {
+  void addEmails(String collectionId, List<Email> emails) async {
     //make sure every email is linked to collection
     for (var e in emails) {
       e.collectionId = collectionId;
+      database.into(database.emails).insertOnConflictUpdate(e);
     }
-
-    database.write(() => {database.addAll<Email>(emails, update: true)});
   }
 
   void deleteEmails(String collectionId, List<Email> emails) {
-    database.write(() => {database.deleteMany<Email>(emails)});
+    for (var e in emails) {
+      database.delete(database.emails).delete(e);
+    }
   }
 }
