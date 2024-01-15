@@ -10,7 +10,7 @@ class GetAppsService extends RxService<GetAppsServiceCommand, List<App>> {
   @override
   Future<List<App>> invoke(GetAppsServiceCommand command) async {
     isLoading.add(true);
-    AppRepository repo = AppRepository(DatabaseRepository.instance.database!);
+    AppRepository repo = AppRepository(DatabaseRepository.instance!.database);
     List<App> apps = await repo.apps();
     sink.add(apps);
     isLoading.add(false);

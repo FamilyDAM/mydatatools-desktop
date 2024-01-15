@@ -40,7 +40,7 @@ class AppRouter {
             if (state.uri.toString() == '/setup') return null;
 
             //check app startup initialization
-            if (DatabaseRepository.instance.database == null) {
+            if (DatabaseRepository.instance == null) {
               var supportPath = await getApplicationSupportDirectory();
               supportDirectory.add(supportPath);
               bool needsSetup = await validateAppDirsAndDb(supportPath);
@@ -185,7 +185,7 @@ class AppRouter {
 
         //on app startup, start db.
         DatabaseRepository db = DatabaseRepository(null, null);
-        print("Schema Version=${db.database!.schemaVersion}");
+        print("Schema Version=${db.database.schemaVersion}");
 
         //last check, do we have any users?
         List<AppUser> users = await GetUsersService.instance.invoke(GetUsersServiceCommand());

@@ -80,7 +80,7 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
 
       //initialize empty database in the user defined directory
       DatabaseRepository(supportDir, AppConstants.dbFileName);
-      UserRepository userRepository = UserRepository(DatabaseRepository.instance.database!);
+      UserRepository userRepository = UserRepository(DatabaseRepository.instance!.database);
 
       //Create new instance of User
       AppUser u = AppUser(

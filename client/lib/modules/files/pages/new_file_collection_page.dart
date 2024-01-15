@@ -111,7 +111,7 @@ class _NewFileCollectionPage extends State<NewFileCollectionPage> {
                                 scanStatus: "pending",
                                 needsReAuth: false);
 
-                            CollectionRepository(DatabaseRepository.instance.database!).addCollection(fc).then((value) {
+                            CollectionRepository(DatabaseRepository.instance!.database).addCollection(fc).then((value) {
                               GetCollectionsService.instance.invoke(GetCollectionsServiceCommand(null)); //reload all
                               //make new default selected collection
                               RxFilesPage.selectedCollection.add(value);

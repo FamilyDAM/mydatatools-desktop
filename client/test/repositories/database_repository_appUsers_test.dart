@@ -31,7 +31,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      databaseRepository.database?.close();
+      databaseRepository.database.close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -42,13 +42,13 @@ void main() {
     });
 
     test('check instance not null', () {
-      expect(databaseRepository.database != null, true);
+      expect(DatabaseRepository.instance, isNotNull);
     });
 
     //Apps, AppUsers, Collections, Emails, Files, Folders
     test('check Apps tables exists', () {
       print("closing database");
-      var tables = databaseRepository.database!.allTables;
+      var tables = databaseRepository.database.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is m.AppUsers;
@@ -59,7 +59,7 @@ void main() {
     test("Delete AppUser", () async {
       m.AppUser user = m.AppUser(
           id: const Uuid().v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.appUsers).insert(user);
 
       List<m.AppUser> allItems = await db.select(db.appUsers).get();
@@ -74,7 +74,7 @@ void main() {
     test("check all properties are saved", () async {
       m.AppUser user = m.AppUser(
           id: const Uuid().v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.appUsers).insert(user);
 
       List<m.AppUser> allItems = await db.select(db.appUsers).get();
@@ -110,7 +110,7 @@ void main() {
           email: "foo@foo.com",
           password: "123",
           localStoragePath: ".");
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.appUsers).insert(user1);
       await db.into(db.appUsers).insert(user2);
       await db.into(db.appUsers).insert(user3);

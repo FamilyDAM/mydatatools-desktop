@@ -245,7 +245,7 @@ class _NewEmailPage extends State<NewEmailPage> {
         var id = existingCollection?.id ?? const Uuid().v4().toString();
 
         // figure out local path to db directory, so we know where to store all local cached files (such as email attachments we download)
-        var root = File(DatabaseRepository.instance.database!.path!).parent.parent;
+        var root = File(DatabaseRepository.instance!.database.path!).parent.parent;
 
         // Create/Update Collection with the following bits of oauth data
         Collection collection = Collection(
@@ -265,7 +265,7 @@ class _NewEmailPage extends State<NewEmailPage> {
 
         //Save collection
         // TODO create Service for addCollection
-        CollectionRepository(DatabaseRepository.instance.database!).addCollection(collection).then((value) {
+        CollectionRepository(DatabaseRepository.instance!.database).addCollection(collection).then((value) {
           GetCollectionsService.instance.invoke(GetCollectionsServiceCommand("email")); //reload all
           //make new default selected collection
           EmailPage.selectedCollection.add(value);

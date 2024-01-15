@@ -36,13 +36,13 @@ class CollectionWatcherIsolate {
     }
 
     DatabaseRepository databaseRepository = DatabaseRepository(path, AppConstants.dbFileName); //dbName
-    print("Sqlite Db initialized in local file = ${databaseRepository.database!.path}");
+    print("Sqlite Db initialized in local file = ${databaseRepository.database.path}");
 
-    fileSystemRepository = FileSystemRepository(databaseRepository.database!);
-    collectionRepository = CollectionRepository(databaseRepository.database!);
-    emailRepository = EmailRepository(databaseRepository.database!);
+    fileSystemRepository = FileSystemRepository(databaseRepository.database);
+    collectionRepository = CollectionRepository(databaseRepository.database);
+    emailRepository = EmailRepository(databaseRepository.database);
 
-    _initializeSyncWatchers(databaseRepository.database!);
+    _initializeSyncWatchers(databaseRepository.database);
   }
 
   final AppLogger logger = AppLogger(null);

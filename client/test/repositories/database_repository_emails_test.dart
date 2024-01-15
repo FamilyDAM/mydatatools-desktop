@@ -33,7 +33,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      databaseRepository.database?.close();
+      databaseRepository.database.close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -44,12 +44,12 @@ void main() {
     });
 
     test('check instance not null', () {
-      expect(databaseRepository.database != null, true);
+      expect(DatabaseRepository.instance, isNotNull);
     });
 
     test('check Collections tables exists', () {
       print("closing database");
-      var tables = databaseRepository.database!.allTables;
+      var tables = databaseRepository.database.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is m.Emails;
@@ -66,7 +66,7 @@ void main() {
           to: ['foo@foo.com'],
           subject: "test email",
           isDeleted: false);
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.emails).insert(email);
 
       List<m.Email> allItems = await db.select(db.emails).get();
@@ -90,7 +90,7 @@ void main() {
           subject: "test email",
           isDeleted: false);
 
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.emails).insert(email);
 
       List<m.Email> allItems = await db.select(db.emails).get();
@@ -133,7 +133,7 @@ void main() {
           subject: "test email",
           isDeleted: false);
 
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.emails).insert(email1);
       await db.into(db.emails).insert(email2);
       await db.into(db.emails).insert(email3);

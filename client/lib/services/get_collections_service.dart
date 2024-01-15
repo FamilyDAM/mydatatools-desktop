@@ -15,7 +15,7 @@ class GetCollectionsService extends RxService<GetCollectionsServiceCommand, List
   Future<List<Collection>> invoke(GetCollectionsServiceCommand command) async {
     isLoading.add(true);
     currentCommand = command;
-    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance.database!);
+    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance!.database);
     if (command.type == null) {
       sink.add(await repo.collections());
     } else {
@@ -27,7 +27,7 @@ class GetCollectionsService extends RxService<GetCollectionsServiceCommand, List
   }
 
   void addCollection(Collection c) {
-    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance.database!);
+    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance!.database);
     //save
     repo.addCollection(c);
     //refresh list with current command type (if defined)

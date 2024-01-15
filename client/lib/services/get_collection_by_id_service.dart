@@ -10,7 +10,7 @@ class GetCollectionByIdService extends RxService<GetCollectionByIdServiceCommand
   @override
   Future<Collection?> invoke(GetCollectionByIdServiceCommand command) async {
     isLoading.add(true);
-    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance.database!);
+    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance!.database);
     Collection? c = await repo.collectionById(command.id);
     if (c != null) {
       sink.add(c);

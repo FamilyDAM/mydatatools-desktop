@@ -10,7 +10,7 @@ class GetUsersService extends RxService<GetUsersServiceCommand, List<AppUser>> {
   @override
   Future<List<AppUser>> invoke(GetUsersServiceCommand command) async {
     isLoading.add(true);
-    UserRepository repo = UserRepository(DatabaseRepository.instance.database!);
+    UserRepository repo = UserRepository(DatabaseRepository.instance!.database);
     List<AppUser> users = await repo.users();
     sink.add(users);
     isLoading.add(false);

@@ -15,7 +15,7 @@ class EmailService extends RxService<EmailServiceCommand, List<Email>> {
   @override
   Future<List<Email>> invoke(EmailServiceCommand command) async {
     isLoading.add(true);
-    emailRepository = EmailRepository(DatabaseRepository.instance.database!);
+    emailRepository = EmailRepository(DatabaseRepository.instance!.database);
 
     //first check for newest emails
 

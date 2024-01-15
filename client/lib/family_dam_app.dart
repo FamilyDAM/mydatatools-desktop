@@ -7,9 +7,9 @@ class FamilyDamApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      restorationScopeId: 'familydam_app',
-      title: "Family D.A.M",
-      debugShowCheckedModeBanner: false,
+      restorationScopeId: 'mydata.tools',
+      title: "MyData / Tools",
+      debugShowCheckedModeBanner: true,
       routerConfig: AppRouter.instance,
       theme: ThemeData(
           useMaterial3: true,

@@ -22,11 +22,11 @@ part 'database_repository.g.dart';
 class DatabaseRepository {
   final AppLogger logger = AppLogger(null);
 
-  AppDatabase? database;
+  late AppDatabase database;
 
   // only have a single app-wide reference to the database
   static DatabaseRepository? _instance;
-  static DatabaseRepository get instance => _instance!; //not null is safe to assume since this is set in constructor
+  static DatabaseRepository? get instance => _instance; //not null is safe to assume since this is set in constructor
 
   DatabaseRepository(String? databasePath, String? databaseName) {
     //initialized db
@@ -39,7 +39,6 @@ class DatabaseRepository {
   // a key-value list of columns.
   Future<int> countAllRows(String table) async {
     AppDatabase? db = database;
-    if (db == null) throw Error();
     var rows = db.customSelect("select count(*) as count from $table;");
     return (await rows.getSingle()).read("count");
   }

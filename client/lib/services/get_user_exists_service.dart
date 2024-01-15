@@ -10,7 +10,7 @@ class GetUserExistsService extends RxService<GetUserExistsServiceCommand, AppUse
   @override
   Future<AppUser?> invoke(GetUserExistsServiceCommand command) async {
     isLoading.add(true);
-    UserRepository repo = UserRepository(DatabaseRepository.instance.database!);
+    UserRepository repo = UserRepository(DatabaseRepository.instance!.database);
     AppUser? user = await repo.userExists();
     sink.add(user);
     isLoading.add(false);

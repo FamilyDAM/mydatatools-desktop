@@ -16,7 +16,7 @@ class GetFileAndFoldersService extends RxService<GetFileServiceCommand, List<Fil
   @override
   Future<List<FileAsset>> invoke(GetFileServiceCommand command) async {
     isLoading.add(true);
-    FileSystemRepository repo = FileSystemRepository(DatabaseRepository.instance.database!);
+    FileSystemRepository repo = FileSystemRepository(DatabaseRepository.instance!.database);
 
     //first refresh folders
     LocalFileScanner(repo.database.path!).start(command.collection, command.path, false, true).then((value) async {

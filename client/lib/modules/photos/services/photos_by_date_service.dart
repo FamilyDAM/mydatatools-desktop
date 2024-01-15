@@ -13,7 +13,7 @@ class PhotosByDateService extends RxService<PhotosByDateServiceCommand, Map<Stri
   @override
   Future<Map<String, List<File>>> invoke(PhotosByDateServiceCommand command) async {
     isLoading.add(true);
-    PhotosRepository repo = PhotosRepository(DatabaseRepository.instance.database!);
+    PhotosRepository repo = PhotosRepository(DatabaseRepository.instance!.database);
 
     //load files and folders from db
     Map<String, List<File>> photos = await repo.photosByDate();

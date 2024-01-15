@@ -33,7 +33,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      databaseRepository.database?.close();
+      databaseRepository.database.close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -44,15 +44,15 @@ void main() {
     });
 
     test('check instance not null', () {
-      expect(databaseRepository.database != null, true);
+      expect(DatabaseRepository.instance, isNotNull);
     });
 
     test('check schema version', () {
-      expect(databaseRepository.database!.schemaVersion, 1);
+      expect(databaseRepository.database.schemaVersion, 1);
     });
 
     test('check Emails tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+      var tables = databaseRepository.database.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is Emails;
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('check Files tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+      var tables = databaseRepository.database.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is Files;
@@ -70,7 +70,7 @@ void main() {
     });
 
     test('check Folders tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+      var tables = databaseRepository.database.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is Folders;

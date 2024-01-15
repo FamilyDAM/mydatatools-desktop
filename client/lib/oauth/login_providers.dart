@@ -100,7 +100,7 @@ extension LoginProviderExtension on LoginProviders {
         var email = emails.firstWhere((element) => (element['metadata']['primary'] ?? false) == true)['value'];
 
         var id = collection?.id ?? const Uuid().v4().toString();
-        var root = File(DatabaseRepository.instance.database!.path!).parent.parent;
+        var root = File(DatabaseRepository.instance!.database.path!).parent.parent;
 
         // Create/Update Collection with the following bits of oauth data
         Collection c = Collection(
@@ -119,7 +119,7 @@ extension LoginProviderExtension on LoginProviders {
             needsReAuth: false);
 
         //Save collection
-        CollectionRepository(DatabaseRepository.instance.database!).addCollection(c).then((value) {
+        CollectionRepository(DatabaseRepository.instance!.database).addCollection(c).then((value) {
           GetCollectionsService.instance.invoke(GetCollectionsServiceCommand("email")); //reload all
           //make new default selected collection
           EmailPage.selectedCollection.add(value);

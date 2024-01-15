@@ -32,7 +32,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      databaseRepository.database?.close();
+      databaseRepository.database.close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -43,12 +43,12 @@ void main() {
     });
 
     test('check instance not null', () {
-      expect(databaseRepository.database != null, true);
+      expect(DatabaseRepository.instance, isNotNull);
     });
 
     //Apps, AppUsers, Collections, Emails, Files, Folders
     test('check Apps tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+      var tables = databaseRepository.database.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is m.Apps;
@@ -64,7 +64,7 @@ void main() {
           group: "files",
           order: 1,
           route: "/app/1");
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.apps).insert(app);
 
       List<m.App> allItems = await db.select(db.apps).get();
@@ -89,7 +89,7 @@ void main() {
           group: "files",
           order: 1,
           route: "/app/1");
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.apps).insert(app);
 
       m.App dbApp = await (db.select(db.apps)..where((a) => a.id.equals(app.id))).getSingle();
@@ -121,7 +121,7 @@ void main() {
           group: "files",
           order: 1,
           route: "/app/3");
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.apps).insert(app1);
       await db.into(db.apps).insert(app2);
       await db.into(db.apps).insert(app3);
@@ -151,7 +151,7 @@ void main() {
           order: 1,
           route: "/app/1");
 
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
 
       expect(() async {
         await db.into(db.apps).insert(app1);

@@ -33,7 +33,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      databaseRepository.database?.close();
+      databaseRepository.database.close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -44,13 +44,13 @@ void main() {
     });
 
     test('check instance not null', () {
-      expect(databaseRepository.database != null, true);
+      expect(DatabaseRepository.instance, isNotNull);
     });
 
     //Apps, AppUsers, Collections, Emails, Files, Folders
     test('check folders tables exists', () {
       print("closing database");
-      var tables = databaseRepository.database!.allTables;
+      var tables = databaseRepository.database.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is m.Folders;
@@ -68,7 +68,7 @@ void main() {
         dateLastModified: DateTime.now(),
         collectionId: const Uuid().v4().toString(),
       );
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.folders).insert(folder);
 
       List<m.Folder> allItems = await db.select(db.folders).get();
@@ -91,7 +91,7 @@ void main() {
         collectionId: const Uuid().v4().toString(),
       );
 
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.folders).insert(folder);
 
       List<m.Folder> allItems = await db.select(db.folders).get();
@@ -134,7 +134,7 @@ void main() {
         collectionId: const Uuid().v4().toString(),
       );
 
-      var db = databaseRepository.database!;
+      var db = databaseRepository.database;
       await db.into(db.folders).insert(folder1);
       await db.into(db.folders).insert(folder2);
       await db.into(db.folders).insert(folder3);

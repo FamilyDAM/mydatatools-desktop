@@ -14,7 +14,7 @@ class GetUserService extends RxService<GetUserServiceCommand, AppUser?> {
       return Future(() => null);
     }
     isLoading.add(true);
-    UserRepository repo = UserRepository(DatabaseRepository.instance.database!);
+    UserRepository repo = UserRepository(DatabaseRepository.instance!.database);
     AppUser? user = await repo.user(command.password!);
     sink.add(user);
     isLoading.add(false);
