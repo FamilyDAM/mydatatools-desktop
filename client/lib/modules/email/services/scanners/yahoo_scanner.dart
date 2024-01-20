@@ -25,7 +25,7 @@ class YahooScanner implements CollectionScanner {
     //skip on restart
     if (!force && collection.lastScanDate != null) return Future(() => 0);
 
-    EmailRepository emailRepository = EmailRepository(database);
+    EmailRepository emailRepository = EmailRepository();
 
     DateTime? minDate = await emailRepository.getMinEmailDate(collection.id);
     String? minQuery;

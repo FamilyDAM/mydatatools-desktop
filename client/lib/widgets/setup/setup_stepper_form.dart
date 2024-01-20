@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:client/app_constants.dart';
-import 'package:client/app_router.dart';
+import 'package:client/helpers/encryption_helper.dart';
+import 'package:client/main.dart';
 import 'package:client/models/tables/app_user.dart';
 import 'package:client/repositories/database_repository.dart';
 import 'package:client/repositories/user_repository.dart';
@@ -10,11 +11,11 @@ import 'package:client/services/get_user_service.dart';
 import 'package:client/widgets/setup/setup_step1.dart';
 import 'package:client/widgets/setup/setup_step2.dart';
 import 'package:client/widgets/setup/setup_step3.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material; //create alias because Padding is in multiple widgets
-import 'package:client/helpers/encryption_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
+import 'package:path/path.dart' as p;
 
 class SetupStepperForm extends StatefulWidget {
   const SetupStepperForm({super.key});
@@ -49,7 +50,7 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
   }
 
   onStepContinueHandler(BuildContext context, AppUser? appUser_, int step) {
-    var sDir = AppRouter.supportDirectory.value;
+    var sDir = MainApp.supportDirectory.value;
     String supportDir = (sDir is String) ? sDir : sDir.path as String;
 
     //update user
@@ -76,11 +77,12 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
       //Write storage location to local lookup file.
       var config = createConfigFile(appUser);
       var jsonConfig = jsonEncode(config);
-      File('$supportDir${Platform.pathSeparator}${AppConstants.configFileName}').writeAsStringSync(jsonConfig);
+
+      File(p.join(supportDir, AppConstants.configFileName)).writeAsStringSync(jsonConfig);
 
       //initialize empty database in the user defined directory
-      DatabaseRepository(supportDir, AppConstants.dbName);
-      UserRepository userRepository = UserRepository(DatabaseRepository.instance!.database);
+      MainApp.appDataDirectory.add(appUser!.localStoragePath);
+      UserRepository userRepository = UserRepository();
 
       //Create new instance of User
       AppUser u = AppUser(
@@ -98,6 +100,7 @@ class _SetupStepperFormState extends State<SetupStepperForm> {
         AppUser? newUser = await GetUserService.instance!.invoke(GetUserServiceCommand(appUser!.password));
         if (newUser != null) {
           if (context.mounted) {
+            DatabaseRepository.isInitialized = true;
             GoRouter.of(context).go("/");
           }
         } else {

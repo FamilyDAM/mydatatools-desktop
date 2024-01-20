@@ -3,10 +3,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:client/app_constants.dart';
+import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/repositories/collection_repository.dart';
-import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -79,6 +79,8 @@ extension LoginProviderExtension on LoginProviders {
   }
 
   static handleGoogleMail(BuildContext context, Collection? collection) async {
+    String appDatabase = MainApp.appDatabase.value;
+
     //Scopes:
     //https://www.googleapis.com/auth/gmail.readonly
     // TODO: Security Assessment will be required
@@ -100,7 +102,7 @@ extension LoginProviderExtension on LoginProviders {
         var email = emails.firstWhere((element) => (element['metadata']['primary'] ?? false) == true)['value'];
 
         var id = collection?.id ?? const Uuid().v4().toString();
-        var root = File(DatabaseRepository.instance!.database.path!).parent.parent;
+        var root = File(appDatabase);
 
         // Create/Update Collection with the following bits of oauth data
         Collection c = Collection(
@@ -119,7 +121,7 @@ extension LoginProviderExtension on LoginProviders {
             needsReAuth: false);
 
         //Save collection
-        CollectionRepository(DatabaseRepository.instance!.database).addCollection(c).then((value) {
+        CollectionRepository().addCollection(c).then((value) {
           GetCollectionsService.instance.invoke(GetCollectionsServiceCommand("email")); //reload all
           //make new default selected collection
           EmailPage.selectedCollection.add(value);

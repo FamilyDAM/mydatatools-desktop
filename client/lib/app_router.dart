@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:client/app_constants.dart';
 import 'package:client/models/tables/app_user.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/modules/email/pages/new_email_page.dart';
@@ -20,17 +17,12 @@ import 'package:client/pages/login.dart';
 import 'package:client/pages/setup.dart';
 import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/get_user_service.dart';
-import 'package:client/services/get_users_service.dart';
 import 'package:client/widgets/router/navigation_wrapper.dart';
 import 'package:client/widgets/router/route_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 class AppRouter {
-  static final BehaviorSubject supportDirectory = BehaviorSubject();
-  static final BehaviorSubject databaseDirectory = BehaviorSubject();
   static GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static get instance => GoRouter(
@@ -41,16 +33,9 @@ class AppRouter {
             if (state.uri.toString() == '/setup') return null;
 
             //check app startup initialization
-            if (DatabaseRepository.instance == null) {
-              var supportPath = await getApplicationSupportDirectory();
-              supportDirectory.add(supportPath);
-              bool needsSetup = await validateAppDirsAndDb(supportPath);
-              if (needsSetup) {
-                return '/setup';
-              }
+            if (!DatabaseRepository.isInitialized) {
+              return '/setup';
             }
-
-            // TODO: add logic to show splash screen
 
             //check if user is logged in
             AppUser? user = GetUserService.instance.sink.valueOrNull;
@@ -164,45 +149,4 @@ class AppRouter {
                       ]),
                 ])
           ]);
-
-  static Future<bool> validateAppDirsAndDb(Directory supportPath) async {
-    File file = File('${supportPath.path}${Platform.pathSeparator}${AppConstants.configFileName}');
-    if (file.existsSync()) {
-      //read location of db, from local config file
-      var storageFile = file.readAsStringSync();
-      var storagePath = jsonDecode(storageFile)['path'];
-      if (File(storageFile).existsSync()) return true;
-
-      //change default app support dir to the one the User Selected during setup, in case they picked a new dir
-      AppRouter.supportDirectory.add(storagePath);
-
-      var dbDir = Directory('$storagePath${Platform.pathSeparator}data');
-      var keyDir = Directory('$storagePath${Platform.pathSeparator}keys');
-      try {
-        //do the app db & file cache directories exists
-        if (!dbDir.existsSync() || dbDir.listSync().isEmpty && !keyDir.existsSync() || keyDir.listSync().isEmpty) {
-          return true; //Needs Setup
-        }
-
-        //on app startup, start db.
-        DatabaseRepository db = DatabaseRepository(null, null);
-        print("Schema Version=${db.database.schemaVersion}");
-
-        //last check, do we have any users?
-        List<AppUser> users = await GetUsersService.instance.invoke(GetUsersServiceCommand());
-        if (users.isEmpty) {
-          return true; //Needs Setup
-        }
-
-        return false; //Start app
-      } catch (err) {
-        //unknown error, restart in setup
-        print(err);
-        return true; //Needs Setup
-      }
-    } else {
-      //config does not exist, run setup
-      return true;
-    }
-  }
 }

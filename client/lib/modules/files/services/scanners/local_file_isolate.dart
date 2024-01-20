@@ -8,7 +8,6 @@ import 'package:client/models/tables/file.dart';
 import 'package:client/models/tables/folder.dart';
 import 'package:client/repositories/database_repository.dart';
 import 'package:flutter/services.dart';
-import 'package:client/app_constants.dart';
 import 'package:client/app_logger.dart';
 import 'package:client/modules/files/files_constants.dart';
 import 'package:client/modules/files/services/file_system_repository.dart';
@@ -122,21 +121,13 @@ class LocalFileIsolate {
     return Future(() => count);
   }
 
-  AppDatabase _initDatabase(String path_) {
-    DatabaseRepository databaseRepository = DatabaseRepository(path_, AppConstants.dbName); //dbName
-
-    print("Sqlite Db initialized in local file = ${databaseRepository.database.path}");
-
-    return databaseRepository.database;
-  }
-
   Future<int> _saveResults(
       AppDatabase database, String collectionId, List<io.FileSystemEntity> files, String parent) async {
     int batchFolderSize = 100;
     int batchFileSize = 100;
     int count = 0;
     //create repository & load list of all existing files
-    FileSystemRepository repo = FileSystemRepository(database);
+    FileSystemRepository repo = FileSystemRepository();
     Map<String, DateTime> existingFolders = {};
     for (var e in (await repo.folders(collectionId, parent))) {
       existingFolders.putIfAbsent('${e.collectionId}:${e.path}', () => e.dateLastModified);
@@ -316,6 +307,8 @@ class LocalFileIsolate {
         return FilesConstants.mimeTypeUnKnown;
     }
   }
+
+  _initDatabase(String dbPath) {}
 }
 
 

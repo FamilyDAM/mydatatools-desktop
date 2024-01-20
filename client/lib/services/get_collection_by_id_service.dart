@@ -1,3 +1,4 @@
+import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/repositories/collection_repository.dart';
 import 'package:client/repositories/database_repository.dart';
@@ -7,10 +8,20 @@ class GetCollectionByIdService extends RxService<GetCollectionByIdServiceCommand
   static final GetCollectionByIdService _instance = GetCollectionByIdService();
   static get instance => _instance;
 
+  AppDatabase? database;
+
+  GetCollectionByIdService() {
+    MainApp.appDatabase.listen((value) {
+      database = value;
+    });
+  }
+
   @override
   Future<Collection?> invoke(GetCollectionByIdServiceCommand command) async {
+    if (database == null) return Future(() => null);
+
     isLoading.add(true);
-    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance!.database);
+    CollectionRepository repo = CollectionRepository();
     Collection? c = await repo.collectionById(command.id);
     if (c != null) {
       sink.add(c);

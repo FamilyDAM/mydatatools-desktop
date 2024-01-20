@@ -3,8 +3,8 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:client/app_constants.dart';
 import 'package:client/app_logger.dart';
+import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/models/tables/file.dart';
@@ -35,14 +35,11 @@ class CollectionWatcherIsolate {
       BackgroundIsolateBinaryMessenger.ensureInitialized(token!);
     }
 
-    DatabaseRepository databaseRepository = DatabaseRepository(path, AppConstants.dbName); //dbName
-    print("Sqlite Db initialized in local file = ${databaseRepository.database.path}");
+    fileSystemRepository = FileSystemRepository();
+    collectionRepository = CollectionRepository();
+    emailRepository = EmailRepository();
 
-    fileSystemRepository = FileSystemRepository(databaseRepository.database);
-    collectionRepository = CollectionRepository(databaseRepository.database);
-    emailRepository = EmailRepository(databaseRepository.database);
-
-    _initializeSyncWatchers(databaseRepository.database);
+    _initializeSyncWatchers(MainApp.appDatabase.value);
   }
 
   final AppLogger logger = AppLogger(null);

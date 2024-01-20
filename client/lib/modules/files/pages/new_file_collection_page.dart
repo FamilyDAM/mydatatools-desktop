@@ -2,7 +2,6 @@ import 'package:client/app_constants.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/files/pages/rx_files_page.dart';
 import 'package:client/repositories/collection_repository.dart';
-import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -111,7 +110,7 @@ class _NewFileCollectionPage extends State<NewFileCollectionPage> {
                                 scanStatus: "pending",
                                 needsReAuth: false);
 
-                            CollectionRepository(DatabaseRepository.instance!.database).addCollection(fc).then((value) {
+                            CollectionRepository().addCollection(fc).then((value) {
                               GetCollectionsService.instance.invoke(GetCollectionsServiceCommand(null)); //reload all
                               //make new default selected collection
                               RxFilesPage.selectedCollection.add(value);

@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:client/app_router.dart';
+import 'package:client/main.dart';
 import 'package:client/models/tables/app_user.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +31,8 @@ class _SetupStep2State extends State<SetupStep2> {
     var appUser = widget.appUser;
 
     if (storageForm.valid && appUser != null) {
-      var supportDir = AppRouter.supportDirectory.value;
-      appUser.localStoragePath = (supportDir is Directory) ? supportDir.path : supportDir;
+      var dbDir = MainApp.appDataDirectory.value;
+      appUser.localStoragePath = (dbDir is Directory) ? dbDir.path : dbDir;
 
       try {
         errorMessage = null;
@@ -68,7 +67,7 @@ class _SetupStep2State extends State<SetupStep2> {
   @override
   Widget build(BuildContext context) {
     //handle async setup for validators
-    var dir = AppRouter.supportDirectory.value;
+    var dir = MainApp.supportDirectory.value;
     var field = storageForm.findControl('storageLocation');
     if (field != null) {
       field.value = (dir is String) ? dir : dir.path;
@@ -90,7 +89,7 @@ class _SetupStep2State extends State<SetupStep2> {
               String? result = await FilePicker.platform.getDirectoryPath();
               if (result != null) {
                 storageForm.findControl('storageLocation')?.value = result;
-                AppRouter.databaseDirectory.add(result);
+                MainApp.appDataDirectory.add(result);
               } else {
                 // User canceled the picker, do nothing
               }

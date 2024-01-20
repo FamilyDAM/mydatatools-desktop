@@ -8,12 +8,12 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:client/app_constants.dart';
+import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/email/pages/email_page.dart';
 import 'package:client/oauth/desktop_oauth_manager.dart';
 import 'package:client/oauth/login_providers.dart';
 import 'package:client/repositories/collection_repository.dart';
-import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -219,6 +219,7 @@ class _NewEmailPage extends State<NewEmailPage> {
   }
 
   handleYahooMail(BuildContext context, List<Collection> collections) async {
+    String rootDirectory = MainApp.appDataDirectory.value;
     //Scopes:
     //https://www.googleapis.com/auth/gmail.readonly
     // TODO: Security Assessment will be required
@@ -245,7 +246,7 @@ class _NewEmailPage extends State<NewEmailPage> {
         var id = existingCollection?.id ?? const Uuid().v4().toString();
 
         // figure out local path to db directory, so we know where to store all local cached files (such as email attachments we download)
-        var root = File(DatabaseRepository.instance!.database.path!).parent.parent;
+        var root = File(rootDirectory);
 
         // Create/Update Collection with the following bits of oauth data
         Collection collection = Collection(
@@ -265,7 +266,7 @@ class _NewEmailPage extends State<NewEmailPage> {
 
         //Save collection
         // TODO create Service for addCollection
-        CollectionRepository(DatabaseRepository.instance!.database).addCollection(collection).then((value) {
+        CollectionRepository().addCollection(collection).then((value) {
           GetCollectionsService.instance.invoke(GetCollectionsServiceCommand("email")); //reload all
           //make new default selected collection
           EmailPage.selectedCollection.add(value);

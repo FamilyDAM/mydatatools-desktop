@@ -1,4 +1,5 @@
 import 'package:client/app_logger.dart';
+import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/modules/email/services/email_repository.dart';
@@ -12,10 +13,20 @@ class EmailService extends RxService<EmailServiceCommand, List<Email>> {
   static final EmailService _instance = EmailService();
   static get instance => _instance;
 
+  AppDatabase? database;
+
+  EmailService() {
+    MainApp.appDatabase.listen((value) {
+      database = value;
+    });
+  }
+
   @override
   Future<List<Email>> invoke(EmailServiceCommand command) async {
+    if (database == null) return Future(() => []);
+
     isLoading.add(true);
-    emailRepository = EmailRepository(DatabaseRepository.instance!.database);
+    emailRepository = EmailRepository();
 
     //first check for newest emails
 

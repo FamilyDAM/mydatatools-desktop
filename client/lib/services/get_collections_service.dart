@@ -1,3 +1,4 @@
+import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/repositories/collection_repository.dart';
 import 'package:client/repositories/database_repository.dart';
@@ -9,13 +10,22 @@ class GetCollectionsService extends RxService<GetCollectionsServiceCommand, List
   static final GetCollectionsService _instance = GetCollectionsService();
   static get instance => _instance;
 
+  AppDatabase? database;
+
+  GetCollectionsService() {
+    MainApp.appDatabase.listen((value) {
+      database = value;
+    });
+  }
   //GetCollectionsService() : super() {}
 
   @override
   Future<List<Collection>> invoke(GetCollectionsServiceCommand command) async {
+    if (database == null) return Future(() => []);
+
     isLoading.add(true);
     currentCommand = command;
-    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance!.database);
+    CollectionRepository repo = CollectionRepository();
     if (command.type == null) {
       sink.add(await repo.collections());
     } else {
@@ -27,7 +37,7 @@ class GetCollectionsService extends RxService<GetCollectionsServiceCommand, List
   }
 
   void addCollection(Collection c) {
-    CollectionRepository repo = CollectionRepository(DatabaseRepository.instance!.database);
+    CollectionRepository repo = CollectionRepository();
     //save
     repo.addCollection(c);
     //refresh list with current command type (if defined)

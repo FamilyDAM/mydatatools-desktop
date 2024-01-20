@@ -28,12 +28,12 @@ void main() {
       });
 
       path = await getTemporaryDirectory();
-      databaseRepository = DatabaseRepository(".", dbName); //dbName
+      databaseRepository = DatabaseRepository(); //dbName
       print(databaseRepository);
     });
 
     tearDownAll(() async {
-      databaseRepository.database.close();
+      databaseRepository.database!.close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -50,7 +50,7 @@ void main() {
     //Apps, AppUsers, Collections, Emails, Files, Folders
     test('check Collections tables exists', () {
       print("closing database");
-      var tables = databaseRepository.database.allTables;
+      var tables = databaseRepository.database!.allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is m.Collections;
@@ -67,7 +67,7 @@ void main() {
           scanner: "",
           scanStatus: "",
           needsReAuth: true);
-      var db = databaseRepository.database;
+      var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection);
 
       List<m.Collection> allItems = await db.select(db.collections).get();
@@ -89,7 +89,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
 
-      var db = databaseRepository.database;
+      var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection);
 
       List<m.Collection> allItems = await db.select(db.collections).get();
@@ -123,7 +123,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
 
-      var db = databaseRepository.database;
+      var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection);
 
       List<m.Collection> allItems = await db.select(db.collections).get();
@@ -191,7 +191,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
 
-      var db = databaseRepository.database;
+      var db = databaseRepository.database!;
       await db.into(db.collections).insert(collection1);
       await db.into(db.collections).insert(collection2);
       await db.into(db.collections).insert(collection3);

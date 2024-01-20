@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io' as io;
 import 'dart:isolate';
 
-import 'package:client/app_constants.dart';
 import 'package:client/app_logger.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/email.dart';
@@ -81,18 +80,10 @@ class GmailScannerIsolate {
     Isolate.exit(resultPort, fileCount);
   }
 
-  AppDatabase _initDatabase(String path_) {
-    DatabaseRepository databaseRepository = DatabaseRepository(path_, AppConstants.dbName); //dbName
-
-    print("Sqlite Db initialized in local file = ${databaseRepository.database.path}");
-
-    return databaseRepository.database;
-  }
-
   /// Starting method to run in isolate
   Future<int> _scanEmail(AppDatabase database, String collectionId) async {
-    CollectionRepository collectionRepository = CollectionRepository(database);
-    EmailRepository emailRepository = EmailRepository(database);
+    CollectionRepository collectionRepository = CollectionRepository();
+    EmailRepository emailRepository = EmailRepository();
 
     Collection? collection = await collectionRepository.collectionById(collectionId);
     if (collection == null) {
@@ -472,4 +463,6 @@ class GmailScannerIsolate {
 
     return files;
   }
+
+  _initDatabase(String dbPath) {}
 }
