@@ -130,7 +130,7 @@ class AppDatabase extends _$AppDatabase {
       List<dynamic> apps = await m.database.select(appsTable!).get();
       //apps
       if (!apps.any((element) => element.slug == "files")) {
-        int rows = await m.database.into(appsTable).insert(App(
+        await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Files",
             slug: 'files',
@@ -141,7 +141,7 @@ class AppDatabase extends _$AppDatabase {
         appsAdded++;
       }
       if (!apps.any((element) => element.slug == "email")) {
-        int rows = await m.database.into(appsTable).insert(App(
+        await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Email",
             slug: 'email',
@@ -152,7 +152,7 @@ class AppDatabase extends _$AppDatabase {
         appsAdded++;
       }
       if (!apps.any((element) => element.slug == "social")) {
-        int rows = await m.database.into(appsTable).insert(App(
+        await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Social Networks",
             slug: 'social',
@@ -163,7 +163,7 @@ class AppDatabase extends _$AppDatabase {
         appsAdded++;
       }
       if (!apps.any((element) => element.slug == "photos")) {
-        int rows = await m.database.into(appsTable).insert(App(
+        await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Photos",
             slug: 'photos',
