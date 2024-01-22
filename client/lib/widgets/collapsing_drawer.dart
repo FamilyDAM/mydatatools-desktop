@@ -45,6 +45,7 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
 
   @override
   void dispose() {
+    _animationController?.dispose();
     _appsSub?.cancel();
     super.dispose();
   }

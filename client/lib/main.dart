@@ -61,6 +61,11 @@ class MainApp {
       //
       MainApp.appDataDirectory.add(storagePath);
 
+      //If this is false, we've reached a state where the local config exists but the older dir where
+      //the user selected as the data folder, in a previous setup, has been deleted.
+      //Maybe we should show a "can't find dialog instead" but for now we'll restart setup.
+      // TODO: Prompt for location of old data files.
+      if (File(storagePath).existsSync()) {}
       // try to initialize repo
       DatabaseRepository repo = DatabaseRepository();
       await repo.initializeDatabase(repo.path);

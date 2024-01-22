@@ -1,16 +1,16 @@
-import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:client/app_constants.dart';
 import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/modules/email/pages/email_page.dart';
+import 'package:client/oauth/desktop_oauth_manager.dart';
 import 'package:client/repositories/collection_repository.dart';
 import 'package:client/services/get_collections_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:client/oauth/desktop_oauth_manager.dart';
 import 'package:uuid/uuid.dart';
 
 enum LoginProviders { google, azure }
@@ -79,7 +79,7 @@ extension LoginProviderExtension on LoginProviders {
   }
 
   static handleGoogleMail(BuildContext context, Collection? collection) async {
-    String appDatabase = MainApp.appDatabase.value;
+    String appDataDir = MainApp.appDataDirectory.value;
 
     //Scopes:
     //https://www.googleapis.com/auth/gmail.readonly
@@ -102,7 +102,7 @@ extension LoginProviderExtension on LoginProviders {
         var email = emails.firstWhere((element) => (element['metadata']['primary'] ?? false) == true)['value'];
 
         var id = collection?.id ?? const Uuid().v4().toString();
-        var root = File(appDatabase);
+        var root = File(appDataDir);
 
         // Create/Update Collection with the following bits of oauth data
         Collection c = Collection(

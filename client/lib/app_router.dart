@@ -53,33 +53,25 @@ class AppRouter {
             ShellRoute(
                 //navigatorKey: _shellNavigatorKey,
                 builder: (context, state, child) {
-                  if (child is HeroControllerScope) {
-                    Navigator navigator = (child).child as Navigator;
-                    RoutePage nw = navigator.pages[navigator.pages.length - 1] as RoutePage;
-                    if (nw.isStandalone == true) {
-                      return child;
-                    }
-                    return NavigationWrapper(body: nw.body, drawer: nw.drawer);
-                  }
                   return child;
                 },
                 routes: [
                   GoRoute(
                       path: '/login',
                       pageBuilder: (BuildContext context, GoRouterState state) {
-                        return const RoutePage(isStandalone: true, body: LoginPage());
+                        return RoutePage(key: UniqueKey(), isStandalone: true, body: const LoginPage());
                       }),
 
                   GoRoute(
                       path: '/setup',
                       pageBuilder: (BuildContext context, GoRouterState state) {
-                        return const RoutePage(isStandalone: true, body: SetupPage());
+                        return RoutePage(key: UniqueKey(), isStandalone: true, body: const SetupPage());
                       }),
 
                   GoRoute(
                       path: '/',
                       pageBuilder: (context, state) {
-                        return const RoutePage(body: HomePage(), drawer: null);
+                        return RoutePage(key: UniqueKey(), body: const NavigationWrapper(body: HomePage()));
                       }),
 
                   /// File Module Routes
@@ -87,64 +79,77 @@ class AppRouter {
                       path: '/files',
                       pageBuilder: (context, state) {
                         //build method will load "new collection form" if needed
-                        return const RoutePage(body: RxFilesPage(), drawer: FileDrawer());
+                        return RoutePage(
+                            key: UniqueKey(), body: const NavigationWrapper(body: RxFilesPage(), drawer: FileDrawer()));
                       },
                       routes: [
                         GoRoute(
                             path: 'add',
-                            pageBuilder: (context, state) =>
-                                const RoutePage(body: NewFileCollectionPage(), drawer: FileDrawer())),
+                            pageBuilder: (context, state) => RoutePage(
+                                key: UniqueKey(),
+                                body: const NavigationWrapper(body: NewFileCollectionPage(), drawer: FileDrawer()))),
                       ]),
 
                   /// Photos Module Routes
                   GoRoute(
                       path: '/photos',
-                      pageBuilder: (context, state) => const RoutePage(body: PhotosApp(), drawer: PhotoDrawer())),
+                      pageBuilder: (context, state) => RoutePage(
+                          key: UniqueKey(), body: const NavigationWrapper(body: PhotosApp(), drawer: PhotoDrawer()))),
 
                   //Email Networks
                   GoRoute(
                       path: '/email',
                       pageBuilder: (context, state) {
-                        return const RoutePage(body: EmailPage(), drawer: EmailDrawer());
+                        return RoutePage(
+                            key: UniqueKey(), body: const NavigationWrapper(body: EmailPage(), drawer: EmailDrawer()));
                       },
                       routes: [
                         GoRoute(
                             path: 'add',
-                            pageBuilder: (context, state) =>
-                                const RoutePage(body: NewEmailPage(), drawer: EmailDrawer())),
+                            pageBuilder: (context, state) => RoutePage(
+                                key: UniqueKey(),
+                                body: const NavigationWrapper(body: NewEmailPage(), drawer: EmailDrawer()))),
                       ]),
 
                   /// Social Archive Module Routes
                   GoRoute(
                       path: '/social',
                       pageBuilder: (context, state) {
-                        return const RoutePage(body: NewSocialPage(), drawer: SocialDrawer());
+                        return RoutePage(
+                            key: UniqueKey(),
+                            body: const NavigationWrapper(body: NewSocialPage(), drawer: SocialDrawer()));
                       },
                       routes: [
-                        GoRoute(path: 'add', pageBuilder: (context, state) => const RoutePage(body: NewSocialPage())),
+                        GoRoute(
+                            path: 'add',
+                            pageBuilder: (context, state) =>
+                                RoutePage(key: UniqueKey(), body: const NavigationWrapper(body: NewSocialPage()))),
                         GoRoute(
                             path: 'facebook/:id',
                             pageBuilder: (context, state) {
                               return RoutePage(
                                   key: UniqueKey(),
-                                  body: FacebookPage(id: state.pathParameters['id']!),
-                                  drawer: const SocialDrawer());
+                                  body: NavigationWrapper(
+                                      body: FacebookPage(id: state.pathParameters['id']!),
+                                      drawer: const SocialDrawer()));
                             }),
                         GoRoute(
                             path: 'twitter/:id',
                             pageBuilder: (context, state) {
                               return RoutePage(
                                   key: UniqueKey(),
-                                  body: TwitterPage(id: state.pathParameters['id']!),
-                                  drawer: const SocialDrawer());
+                                  body: NavigationWrapper(
+                                      body: TwitterPage(id: state.pathParameters['id']!),
+                                      drawer: const SocialDrawer()));
                             }),
                         GoRoute(
                             path: 'instagram/:id',
                             pageBuilder: (context, state) {
                               return RoutePage(
                                   key: UniqueKey(),
-                                  body: InstagramPage(id: state.pathParameters["id"]!),
-                                  drawer: const SocialDrawer());
+                                  body: NavigationWrapper(
+                                      body: InstagramPage(id: state.pathParameters["id"]!),
+                                      drawer: const SocialDrawer()));
                             }),
                       ]),
                 ])

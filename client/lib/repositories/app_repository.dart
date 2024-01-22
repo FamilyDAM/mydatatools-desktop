@@ -16,6 +16,7 @@ class AppRepository {
   }
 
   AppRepository._internal() {
+    database = MainApp.appDatabase.value;
     MainApp.appDatabase.listen((value) {
       database = value;
     });

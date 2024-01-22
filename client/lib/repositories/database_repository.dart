@@ -104,7 +104,7 @@ class AppDatabase extends _$AppDatabase {
         print("Creating all Tables");
         await m.createAll();
         print("Load initial data");
-        _loadInitialData(m);
+        await _loadInitialData(m);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
@@ -121,15 +121,16 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Make sure each app is in database
-  void _loadInitialData(Migrator m) async {
+  Future<int> _loadInitialData(Migrator m) async {
     try {
+      int appsAdded = 0;
       //Load initial data
       TableInfo<Table, dynamic>? appsTable = m.database.allTables.firstWhereOrNull((e) => e.actualTableName == 'apps');
 
       List<dynamic> apps = await m.database.select(appsTable!).get();
       //apps
       if (!apps.any((element) => element.slug == "files")) {
-        m.database.into(appsTable).insert(App(
+        int rows = await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Files",
             slug: 'files',
@@ -137,9 +138,10 @@ class AppDatabase extends _$AppDatabase {
             order: 10,
             icon: 0xe2a3,
             route: "/files"));
+        appsAdded++;
       }
       if (!apps.any((element) => element.slug == "email")) {
-        m.database.into(appsTable).insert(App(
+        int rows = await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Email",
             slug: 'email',
@@ -147,9 +149,10 @@ class AppDatabase extends _$AppDatabase {
             order: 30,
             icon: 0xe2a3,
             route: "/email"));
+        appsAdded++;
       }
       if (!apps.any((element) => element.slug == "social")) {
-        m.database.into(appsTable).insert(App(
+        int rows = await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Social Networks",
             slug: 'social',
@@ -157,9 +160,10 @@ class AppDatabase extends _$AppDatabase {
             order: 50,
             icon: 0xe2a3,
             route: "/social"));
+        appsAdded++;
       }
       if (!apps.any((element) => element.slug == "photos")) {
-        m.database.into(appsTable).insert(App(
+        int rows = await m.database.into(appsTable).insert(App(
             id: const Uuid().v4().toString(),
             name: "Photos",
             slug: 'photos',
@@ -167,7 +171,10 @@ class AppDatabase extends _$AppDatabase {
             order: 20,
             icon: 0xe2a3,
             route: "/photos"));
+        appsAdded++;
       }
+
+      return Future(() => appsAdded);
     } catch (err) {
       logger.e(err);
       rethrow;
