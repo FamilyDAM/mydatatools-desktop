@@ -32,14 +32,17 @@ class _LoginFormState extends State<LoginForm> {
     ServicesBinding.instance.keyboard.addHandler(onKey);
 
     (() async {
-      //Pull saved password out of OS secure storage
-      if (await secureStorage?.containsKey(key: AppConstants.securePassword) ?? false) {
-        String pwd = await secureStorage?.read(key: AppConstants.securePassword) ?? '';
-        setState(() {
-          savedPassword = pwd;
-        });
-      } else {
-        logger.i("saved password not found");
+      // TODO: initialize secureStorage
+      if (secureStorage != null) {
+        //Pull saved password out of OS secure storage
+        if (await secureStorage?.containsKey(key: AppConstants.securePassword) ?? false) {
+          String pwd = await secureStorage?.read(key: AppConstants.securePassword) ?? '';
+          setState(() {
+            savedPassword = pwd;
+          });
+        } else {
+          logger.i("saved password not found");
+        }
       }
     }).call();
   }

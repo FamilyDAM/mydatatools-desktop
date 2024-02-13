@@ -2,7 +2,6 @@ import 'dart:io' as io;
 
 import 'package:client/models/tables/app.dart' as m;
 import 'package:client/repositories/database_repository.dart';
-import 'package:collection/collection.dart';
 import 'package:drift/isolate.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,12 +26,12 @@ void main() {
       });
 
       path = await getTemporaryDirectory();
-      databaseRepository = DatabaseRepository(); //dbName
+      databaseRepository = DatabaseRepository.instance; //dbName
       print(databaseRepository);
     });
 
     tearDownAll(() async {
-      databaseRepository.database!.close();
+      (await databaseRepository.database).close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -47,10 +46,10 @@ void main() {
     });
 
     //Apps, AppUsers, Collections, Emails, Files, Folders
-    test('check Apps tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+    test('check Apps tables exists', () async {
+      var tables = (await databaseRepository.database).allTables;
 
-      var t = tables.firstWhereOrNull((e) {
+      var t = tables.firstWhere((e) {
         return e is m.Apps;
       });
       expect(t != null, true);
@@ -64,7 +63,7 @@ void main() {
           group: "files",
           order: 1,
           route: "/app/1");
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.apps).insert(app);
 
       List<m.App> allItems = await db.select(db.apps).get();
@@ -89,7 +88,7 @@ void main() {
           group: "files",
           order: 1,
           route: "/app/1");
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.apps).insert(app);
 
       m.App dbApp = await (db.select(db.apps)..where((a) => a.id.equals(app.id))).getSingle();
@@ -121,7 +120,7 @@ void main() {
           group: "files",
           order: 1,
           route: "/app/3");
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.apps).insert(app1);
       await db.into(db.apps).insert(app2);
       await db.into(db.apps).insert(app3);
@@ -151,7 +150,7 @@ void main() {
           order: 1,
           route: "/app/1");
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
 
       expect(() async {
         await db.into(db.apps).insert(app1);

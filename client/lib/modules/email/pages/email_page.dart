@@ -5,7 +5,7 @@ import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/modules/email/notifications/email_sort_changed_notification.dart';
 import 'package:client/modules/email/pages/new_email_page.dart';
-import 'package:client/modules/email/services/email_service.dart';
+import 'package:client/modules/email/services/get_emails_service.dart';
 import 'package:client/modules/email/widgets/email_details.dart';
 import 'package:client/modules/email/widgets/email_table.dart';
 import 'package:client/scanners/scanner_manager.dart';
@@ -25,7 +25,7 @@ class EmailPage extends StatefulWidget {
 class _EmailPage extends State<EmailPage> {
   AppLogger logger = AppLogger(null);
 
-  EmailService? _emailService;
+  GetEmailsService? _emailService;
   GetCollectionsService? _collectionService;
   StreamSubscription<List<Collection>>? _collectionsServiceSub;
   StreamSubscription? _selectedCollectionSub;
@@ -57,7 +57,7 @@ class _EmailPage extends State<EmailPage> {
       //call service to load all emails
       if (value != null && collection != value) {
         //create new sub for emails in this collection
-        _emailService = EmailService();
+        _emailService = GetEmailsService.instance;
         //close old subscription
         if (_emailsSub != null) _emailsSub?.cancel();
         //listen for changes while visible

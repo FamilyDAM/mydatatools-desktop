@@ -17,22 +17,21 @@ class PhotosApp extends StatefulWidget {
 }
 
 class _PhotosApp extends State<PhotosApp> {
-  PhotosByDateService? _photosByDateService;
   StreamSubscription? _photosSub;
 
   Map<String, List<File>> photos = {};
 
   @override
   void initState() {
-    _photosByDateService = PhotosByDateService.instance;
+    PhotosByDateService photosByDateService = PhotosByDateService();
 
-    _photosSub = _photosByDateService!.sink.listen((value) {
+    _photosSub = photosByDateService.sink.listen((value) {
       setState(() {
         photos = value;
       });
     });
 
-    _photosByDateService!.invoke(PhotosByDateServiceCommand()); //load all
+    photosByDateService!.invoke(PhotosByDateServiceCommand()); //load all
     super.initState();
   }
 

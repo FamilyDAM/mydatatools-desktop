@@ -2,7 +2,6 @@ import 'dart:io' as io;
 
 import 'package:client/models/tables/email.dart' as m;
 import 'package:client/repositories/database_repository.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,7 +13,7 @@ void main() {
   group('DatabaseRepository', () {
     late DatabaseRepository databaseRepository;
     io.Directory? path;
-    String dbName = 'test-${DateTime.now().millisecondsSinceEpoch}.sqllite';
+    String dbName = 'test-${DateTime.now().millisecondsSinceEpoch}.sqlite';
 
     setUpAll(() async {
       //final Uri basedir = (goldenFileComparator as LocalFileComparator).basedir;
@@ -28,12 +27,12 @@ void main() {
       });
 
       path = await getTemporaryDirectory();
-      databaseRepository = DatabaseRepository(); //dbName
+      databaseRepository = DatabaseRepository.instance; //dbName
       print(databaseRepository);
     });
 
     tearDownAll(() async {
-      databaseRepository.database!.close();
+      (await databaseRepository.database).close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -47,11 +46,11 @@ void main() {
       expect(DatabaseRepository.instance, isNotNull);
     });
 
-    test('check Collections tables exists', () {
+    test('check Collections tables exists', () async {
       print("closing database");
-      var tables = databaseRepository.database!.allTables;
+      var tables = (await databaseRepository.database).allTables;
 
-      var t = tables.firstWhereOrNull((e) {
+      var t = tables.firstWhere((e) {
         return e is m.Emails;
       });
       expect(t != null, true);
@@ -66,7 +65,7 @@ void main() {
           to: ['foo@foo.com'],
           subject: "test email",
           isDeleted: false);
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.emails).insert(email);
 
       List<m.Email> allItems = await db.select(db.emails).get();
@@ -90,7 +89,7 @@ void main() {
           subject: "test email",
           isDeleted: false);
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database!;
       await db.into(db.emails).insert(email);
 
       List<m.Email> allItems = await db.select(db.emails).get();
@@ -133,7 +132,7 @@ void main() {
           subject: "test email",
           isDeleted: false);
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.emails).insert(email1);
       await db.into(db.emails).insert(email2);
       await db.into(db.emails).insert(email3);

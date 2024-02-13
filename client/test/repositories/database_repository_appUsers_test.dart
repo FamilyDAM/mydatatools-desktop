@@ -2,7 +2,6 @@ import 'dart:io' as io;
 
 import 'package:client/models/tables/app_user.dart' as m;
 import 'package:client/repositories/database_repository.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,7 +10,7 @@ import 'package:uuid/uuid.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('DatabaseRepository', () {
+  group('DatabaseRepository', () async {
     late DatabaseRepository databaseRepository;
     io.Directory? path;
     String dbName = 'test-${DateTime.now().millisecondsSinceEpoch}.sqllite';
@@ -26,12 +25,12 @@ void main() {
       });
 
       path = await getTemporaryDirectory();
-      databaseRepository = DatabaseRepository(); //dbName
+      databaseRepository = DatabaseRepository.instance; //dbName
       print(databaseRepository);
     });
 
     tearDownAll(() async {
-      databaseRepository.database!.close();
+      (await databaseRepository.database).close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -46,11 +45,11 @@ void main() {
     });
 
     //Apps, AppUsers, Collections, Emails, Files, Folders
-    test('check Apps tables exists', () {
+    test('check Apps tables exists', () async {
       print("closing database");
-      var tables = databaseRepository.database!.allTables;
+      var tables = (await databaseRepository.database).allTables;
 
-      var t = tables.firstWhereOrNull((e) {
+      var t = tables.firstWhere((e) {
         return e is m.AppUsers;
       });
       expect(t != null, true);
@@ -59,7 +58,7 @@ void main() {
     test("Delete AppUser", () async {
       m.AppUser user = m.AppUser(
           id: const Uuid().v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.appUsers).insert(user);
 
       List<m.AppUser> allItems = await db.select(db.appUsers).get();
@@ -74,7 +73,7 @@ void main() {
     test("check all properties are saved", () async {
       m.AppUser user = m.AppUser(
           id: const Uuid().v4().toString(), name: "mike", email: "foo@foo.com", password: "123", localStoragePath: ".");
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.appUsers).insert(user);
 
       List<m.AppUser> allItems = await db.select(db.appUsers).get();
@@ -110,7 +109,7 @@ void main() {
           email: "foo@foo.com",
           password: "123",
           localStoragePath: ".");
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.appUsers).insert(user1);
       await db.into(db.appUsers).insert(user2);
       await db.into(db.appUsers).insert(user3);

@@ -7,7 +7,7 @@ import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/models/tables/file.dart';
 import 'package:client/modules/email/services/email_repository.dart';
-import 'package:client/modules/email/services/email_service.dart';
+import 'package:client/modules/email/services/get_emails_service.dart';
 import 'package:client/oauth/google_auth_client.dart';
 import 'package:client/repositories/collection_repository.dart';
 import 'package:client/repositories/database_repository.dart';
@@ -41,7 +41,7 @@ class GmailScannerIsolate {
     p.listen((message) {
       if (message is String) {
         if (message == "command:refresh") {
-          EmailService.instance.invoke(EmailServiceCommand(collection, "date", false));
+          GetEmailsService.instance.invoke(EmailServiceCommand(collection, "date", false));
         } else {
           // TODO
         }

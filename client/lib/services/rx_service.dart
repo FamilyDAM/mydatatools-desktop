@@ -22,6 +22,7 @@ class RxService<C, R> {
   /// support direct invocation to get immediate value while at the same time
   /// putting the value in a Stream for any other listeners.
   Future<R> invoke(C command) async => throw UnimplementedError();
+  Future<R?> invokeOrNull(C command) async => throw UnimplementedError();
 }
 
 abstract class RxCommand {}

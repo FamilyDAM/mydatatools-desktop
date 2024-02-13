@@ -20,6 +20,7 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
   double maxWidth = 210;
   double minWidth = 70;
   bool isCollapsed = true;
+  bool isLoading = true;
   AnimationController? _animationController;
   Animation<double>? widthAnimation;
   int currentSelectedIndex = 0;
@@ -34,6 +35,13 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
     widthAnimation = Tween<double>(begin: minWidth, end: maxWidth).animate(_animationController!);
 
     _getAppsService = GetAppsService.instance;
+    //flag to hide/show loading icon
+    _getAppsService!.isLoading.listen((value) {
+      setState(() {
+        isLoading = value;
+      });
+    });
+    //list of all apps
     _appsSub = _getAppsService!.sink.listen((value) {
       setState(() {
         apps = value;
@@ -63,6 +71,10 @@ class _CollapsingDrawerState extends State<CollapsingDrawer> with SingleTickerPr
 
     var collectionApps = apps.where((e) => e.group == 'collections').toList();
     var appApps = apps.where((e) => e.group == 'app').toList();
+
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return MouseRegion(
         onEnter: (PointerEnterEvent details) {

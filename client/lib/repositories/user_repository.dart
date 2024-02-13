@@ -1,44 +1,28 @@
 import 'dart:io';
 
 import 'package:client/app_logger.dart';
-import 'package:client/main.dart';
 import 'package:client/models/tables/app_user.dart';
 import 'package:client/repositories/database_repository.dart';
 
 class UserRepository {
-  static UserRepository get instance => UserRepository();
-
-  AppDatabase? database;
   AppLogger logger = AppLogger(null);
-  static UserRepository repo = UserRepository._internal();
-
-  factory UserRepository() {
-    return repo;
-  }
-
-  UserRepository._internal() {
-    database = MainApp.appDatabase.value;
-    MainApp.appDatabase.listen((value) {
-      database = value;
-    });
-  }
 
   Future<List<AppUser>> users() async {
-    if (database == null) return Future(() => []);
-    return await database!.select(database!.appUsers).get();
+    AppDatabase database = await DatabaseRepository.instance.database;
+    return await database.select(database.appUsers).get();
   }
 
   Future<AppUser?> userExists() async {
-    if (database == null) return Future(() => null);
-    AppUser? user = await database!.select(database!.appUsers).getSingleOrNull();
+    AppDatabase database = await DatabaseRepository.instance.database;
+    AppUser? user = await database.select(database.appUsers).getSingleOrNull();
     return user;
   }
 
   /// Search for user by password that has been hashed with a PBKDF2 algorithm
   Future<AppUser?> user(String password) async {
-    if (database == null) return Future(() => null);
+    AppDatabase database = await DatabaseRepository.instance.database;
     AppUser? user =
-        await (database!.select(database!.appUsers)..where((e) => e.password.equals(password))).getSingleOrNull();
+        await (database.select(database.appUsers)..where((e) => e.password.equals(password))).getSingleOrNull();
     if (user != null) {
       String keyDir = '${user.localStoragePath}${Platform.pathSeparator}keys';
       String publicFilePath = '$keyDir/public.pem';
@@ -56,7 +40,7 @@ class UserRepository {
   /// Save user to database
   /// Save public/private keys to /key folder
   Future<AppUser?> saveUser(AppUser user) async {
-    if (database == null) return Future(() => null);
+    AppDatabase database = await DatabaseRepository.instance.database;
     //Save key into secure storage
     //save keys
     String keyDir = '${user.localStoragePath}${Platform.pathSeparator}keys';
@@ -77,7 +61,7 @@ class UserRepository {
     //FlutterSecureStorage storage = const FlutterSecureStorage();
     //await storage.write(key: AppConstants.securePassword, value: user.password);
 
-    int rowsUpdated = await database!.into(database!.appUsers).insertOnConflictUpdate(user);
+    int rowsUpdated = await database.into(database.appUsers).insertOnConflictUpdate(user);
 
     if (rowsUpdated == 0) {
       throw Exception("Error saving user");

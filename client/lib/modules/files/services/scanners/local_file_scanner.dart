@@ -1,18 +1,26 @@
 import 'dart:async';
-import 'dart:isolate';
 
 import 'package:client/app_logger.dart';
 import 'package:client/models/tables/collection.dart';
+import 'package:client/models/tables/file.dart';
+import 'package:client/models/tables/file_asset.dart';
+import 'package:client/models/tables/folder.dart';
+import 'package:client/modules/files/services/file_upsert_service.dart';
 import 'package:client/modules/files/services/scanners/local_file_isolate.dart';
+import 'package:client/modules/files/services/scanners/local_file_scanner2.dart';
+import 'package:client/repositories/database_repository.dart';
 import 'package:client/scanners/collection_scanner.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/isolate.dart';
+import 'package:flutter/foundation.dart';
 
 class LocalFileScanner implements CollectionScanner {
-  String dbPath;
+  AppDatabase database;
   bool isStopped = false;
   LocalFileIsolate? fileIsolate;
 
   AppLogger logger = AppLogger(null);
-  LocalFileScanner(this.dbPath);
+  LocalFileScanner(this.database);
 
   /// Start an Isolate to scan all files and sub-directories linked to a collection
   /// Or if called while the user is browsing, scan the current directory
@@ -25,20 +33,62 @@ class LocalFileScanner implements CollectionScanner {
   /// Returns the number of files scanned
   @override
   Future<int> start(Collection collection, String? path, bool recursive, bool force) async {
-    // check if scan has already been run once
-    if (!force && collection.lastScanDate != null) return Future(() => 0);
-    // TODO: add a date range check to rerun scan
+    // final connection = await database.serializableConnection();
 
-    //start full scan in isolate
-    ReceivePort receivePort = ReceivePort();
-    fileIsolate = LocalFileIsolate(dbPath, receivePort.sendPort);
-    int count = await fileIsolate!.start(collection, path ?? collection.path, recursive, force);
+    int count = await database.computeWithDatabase(
+      computation: (database) async {
+        // Expensive computation that runs on its own isolate but talks to the
+        // main database.
+        int count = 0;
+        List<FileAsset> filesAndFolders = [];
 
-    receivePort.listen((message) {
-      if (message is String && message.isNotEmpty) {
-        logger.s(message);
-      }
-    });
+        // We can't share the [database] object across isolates, but the connection is fine!
+        LocalFileScanner2 streamScanner = LocalFileScanner2(collection.id, path ?? collection.path);
+        StreamController<List<FileAsset>> controller = StreamController();
+
+        controller.stream.listen((event) async {
+          //save files
+          Iterable<File> fileList = event.whereType<File>().toList();
+          List<Future> fileFutures = [];
+          for (var file in fileList) {
+            FileUpsertService.instance.invoke(FileUpsertServiceCommand(file));
+          }
+          //wait for all file inserts to complete
+          //await Future.wait(fileFutures);
+
+          //save folders
+          Iterable<Folder> folderList = event.whereType<Folder>().toList();
+          List<Future> folderFutures = [];
+          for (var folder in folderList) {
+            try {
+              // add if missing
+              QueryRow? row = await database.customSelect("select id from folders where path = ?",
+                  variables: [Variable.withString(folder.path)]).getSingleOrNull();
+              if (row == null) {
+                await database.into(database.folders).insert(folder);
+              }
+            } catch (err) {
+              debugPrint(err.toString());
+            }
+          }
+          //wait for all folders to complete
+          //Future.wait(folderFutures);
+        }, onDone: () {
+          print("Scan Complete");
+        });
+
+        //Using the controller, scan the dir and return all items to the callback above
+        count = await streamScanner.scanDir(controller, path!, recursive);
+        return Future(() => count);
+      },
+      connect: (connection) {
+        // This function is responsible for creating a second instance of your
+        // database class with a short-lived [connection].
+        // For this to work, your database class needs to have a constructor that
+        // allows taking a connection as described above.
+        return AppDatabase(connection);
+      },
+    );
 
     return Future(() => count);
   }

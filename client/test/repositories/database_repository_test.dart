@@ -28,12 +28,12 @@ void main() {
       });
 
       path = await getTemporaryDirectory();
-      databaseRepository = DatabaseRepository(); //dbName
+      databaseRepository = DatabaseRepository.instance; //dbName
       print(databaseRepository);
     });
 
     tearDownAll(() async {
-      databaseRepository.database!.close();
+      (await databaseRepository.database).close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -47,12 +47,12 @@ void main() {
       expect(DatabaseRepository.instance, isNotNull);
     });
 
-    test('check schema version', () {
-      expect(databaseRepository.database!.schemaVersion, 1);
+    test('check schema version', () async {
+      expect((await databaseRepository.database).schemaVersion, 1);
     });
 
-    test('check Emails tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+    test('check Emails tables exists', () async {
+      var tables = (await databaseRepository.database).allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is Emails;
@@ -60,8 +60,8 @@ void main() {
       expect(t != null, true);
     });
 
-    test('check Files tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+    test('check Files tables exists', () async {
+      var tables = (await databaseRepository.database).allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is Files;
@@ -69,8 +69,8 @@ void main() {
       expect(t != null, true);
     });
 
-    test('check Folders tables exists', () {
-      var tables = databaseRepository.database!.allTables;
+    test('check Folders tables exists', () async {
+      var tables = (await databaseRepository.database).allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is Folders;

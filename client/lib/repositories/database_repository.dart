@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:client/app_constants.dart';
@@ -22,42 +23,41 @@ import 'package:uuid/uuid.dart';
 part 'database_repository.g.dart';
 
 class DatabaseRepository {
+  // Singleton instance
+  static final DatabaseRepository _singleton = DatabaseRepository._();
+
+  // Singleton accessor
+  static DatabaseRepository get instance => _singleton;
+
+  // Completer is used for transforming synchronous code into asynchronous code.
+  Completer<AppDatabase>? _dbOpenCompleter;
+
   final AppLogger logger = AppLogger(null);
-
-  DatabaseRepository() {
-    path = MainApp.appDataDirectory.value;
-    MainApp.appDataDirectory.distinct().listen((value) async {
-      if (path != value && _database != null) {
-        if (_database != null) {
-          _database!.close();
-          _database = null;
-        }
-        path = value;
-      }
-    });
-  }
-
   static bool isInitialized = false;
-
-  static DatabaseRepository? _instance;
-  static DatabaseRepository? get instance => _instance;
-
+  bool useMemoryDb = false;
   late String path;
 
-  AppDatabase? _database;
-  AppDatabase? get database => _database;
+  // A private constructor. Allows us to create instances of AppDatabase
+  // only from within the AppDatabase class itself.
+  DatabaseRepository._();
 
-  // All of the rows are returned as a list of maps, where each map is
-  // a key-value list of columns.
-  Future<int> countAllRows(String table) async {
-    AppDatabase? db = database;
-    if (db == null) throw Exception("Query is being run before database has been initialized");
-
-    var rows = db.customSelect("select count(*) as count from $table;");
-    return (await rows.getSingle()).read("count");
+  // Database object accessor
+  Future<AppDatabase> get database async {
+    // If completer is null, AppDatabaseClass is newly instantiated, so database is not yet opened
+    if (_dbOpenCompleter == null) {
+      _dbOpenCompleter = Completer();
+      //
+      String path = MainApp.appDataDirectory.value;
+      // Calling _openDatabase will also complete the completer with database instance
+      await _openDatabase(path);
+    }
+    // If the database is already opened, awaiting the future will happen instantly.
+    // Otherwise, awaiting the returned future will take some time - until complete() is called
+    // on the Completer in _openDatabase() below.
+    return _dbOpenCompleter!.future;
   }
 
-  initializeDatabase(String storagePath) async {
+  Future _openDatabase(String storagePath) async {
     try {
       //make sure root dir exists
       io.Directory(storagePath).createSync(recursive: true);
@@ -70,29 +70,47 @@ class DatabaseRepository {
       io.Directory(fileDir.path).createSync(recursive: true);
 
       //on app startup, start db.
-      _database = AppDatabase(storagePath, AppConstants.dbName);
-      print("DB Schema Version=${_database!.schemaVersion}");
+      AppDatabase database = AppDatabase(null, storagePath, AppConstants.dbName, useMemoryDb);
+      print("DB Schema Version=${database.schemaVersion}");
 
       //last check, if we have no users then we need to re-run database
-      var users = await _database!.select(_database!.appUsers).get();
+      var users = await database.select(database.appUsers).get();
       if (users.isNotEmpty) {
         DatabaseRepository.isInitialized = true;
       }
 
-      MainApp.appDatabase.add(_database);
+      // Any code awaiting the Completers future will now start executing
+      _dbOpenCompleter!.complete(database);
     } catch (err) {
       //unknown error
       print(err);
     }
+  }
+
+  ///
+  /// Helper SQL Methods
+  ///
+
+  // All of the rows are returned as a list of maps, where each map is
+  // a key-value list of columns.
+  Future<int> countAllRows(String table) async {
+    AppDatabase db = await database;
+    if (db == null) throw Exception("Query is being run before database has been initialized");
+
+    var rows = db.customSelect("select count(*) as count from $table;");
+    return (await rows.getSingle()).read("count");
   }
 }
 
 @DriftDatabase(tables: [Apps, AppUsers, Collections, Emails, Files, Folders, Albums])
 class AppDatabase extends _$AppDatabase {
   final AppLogger logger = AppLogger(null);
-  AppDatabase(String path, String name) : super(_openConnection(path, name));
+
+  AppDatabase([QueryExecutor? executor, String? path, String? name, bool useMemoryDb = false])
+      : super(executor ?? _openConnection(path, name, useMemoryDb));
 
   String? path;
+  String? name;
 
   @override
   int get schemaVersion => 1;
@@ -182,23 +200,29 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
-LazyDatabase _openConnection(String path, String name) {
+LazyDatabase _openConnection(String? path, String? name, bool useMemoryDb) {
+  if (path == null || name == null) {
+    throw ("Path or Name not provided, can not start scanner");
+  }
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
-    print("Initialize Database");
+    print('Initialize Database | path=$path');
     //check app startup initialization
-    io.File file = io.File(p.join(path, 'data', name));
+    io.File file = io.File(p.join(path!, 'data', name));
     path = file.path;
 
     // Make sqlite3 pick a more suitable location for temporary files - the
-    // one from the system may be inaccessible due to sandboxing.
+    // one from the system may be inaccessible due to ios/mac app sandbox.
     // We can't access /tmp on Android, which sqlite3 would try by default.
     // Explicitly tell it about the correct temporary directory.
     sqlite3.tempDirectory = (await getTemporaryDirectory()).path;
 
     print("Opening Database | $path");
-    QueryExecutor qe =
-        NativeDatabase.createInBackground(file, logStatements: true, cachePreparedStatements: true, setup: null);
-    return qe;
+    if (!useMemoryDb) {
+      return NativeDatabase(file, logStatements: true, cachePreparedStatements: true, setup: null);
+      //return NativeDatabase.createInBackground(file, logStatements: true, cachePreparedStatements: true, setup: null);
+    } else {
+      return NativeDatabase.memory(logStatements: true, setup: null, cachePreparedStatements: false);
+    }
   });
 }

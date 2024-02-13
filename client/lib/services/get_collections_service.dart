@@ -1,28 +1,15 @@
-import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/repositories/collection_repository.dart';
-import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/rx_service.dart';
 
 class GetCollectionsService extends RxService<GetCollectionsServiceCommand, List<Collection>> {
+  static final GetCollectionsService _singleton = GetCollectionsService();
+  static get instance => _singleton;
+
   GetCollectionsServiceCommand? currentCommand;
-
-  static final GetCollectionsService _instance = GetCollectionsService();
-  static get instance => _instance;
-
-  AppDatabase? database;
-
-  GetCollectionsService() {
-    MainApp.appDatabase.listen((value) {
-      database = value;
-    });
-  }
-  //GetCollectionsService() : super() {}
 
   @override
   Future<List<Collection>> invoke(GetCollectionsServiceCommand command) async {
-    if (database == null) return Future(() => []);
-
     isLoading.add(true);
     currentCommand = command;
     CollectionRepository repo = CollectionRepository();

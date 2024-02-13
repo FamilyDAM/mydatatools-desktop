@@ -2,7 +2,6 @@ import 'dart:io' as io;
 
 import 'package:client/models/tables/collection.dart' as m;
 import 'package:client/repositories/database_repository.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,7 +13,7 @@ void main() {
   group('DatabaseRepository', () {
     late DatabaseRepository databaseRepository;
     io.Directory? path;
-    String dbName = 'test-${DateTime.now().millisecondsSinceEpoch}.sqllite';
+    String dbName = 'test-${DateTime.now().millisecondsSinceEpoch}.sqlite';
 
     setUpAll(() async {
       //final Uri basedir = (goldenFileComparator as LocalFileComparator).basedir;
@@ -28,12 +27,12 @@ void main() {
       });
 
       path = await getTemporaryDirectory();
-      databaseRepository = DatabaseRepository(); //dbName
+      databaseRepository = DatabaseRepository.instance; //dbName
       print(databaseRepository);
     });
 
     tearDownAll(() async {
-      databaseRepository.database!.close();
+      (await databaseRepository.database).close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -48,11 +47,11 @@ void main() {
     });
 
     //Apps, AppUsers, Collections, Emails, Files, Folders
-    test('check Collections tables exists', () {
+    test('check Collections tables exists', () async {
       print("closing database");
-      var tables = databaseRepository.database!.allTables;
+      var tables = (await databaseRepository.database).allTables;
 
-      var t = tables.firstWhereOrNull((e) {
+      var t = tables.firstWhere((e) {
         return e is m.Collections;
       });
       expect(t != null, true);
@@ -67,7 +66,7 @@ void main() {
           scanner: "",
           scanStatus: "",
           needsReAuth: true);
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.collections).insert(collection);
 
       List<m.Collection> allItems = await db.select(db.collections).get();
@@ -89,7 +88,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.collections).insert(collection);
 
       List<m.Collection> allItems = await db.select(db.collections).get();
@@ -123,7 +122,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.collections).insert(collection);
 
       List<m.Collection> allItems = await db.select(db.collections).get();
@@ -191,7 +190,7 @@ void main() {
           scanStatus: "",
           needsReAuth: true);
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.collections).insert(collection1);
       await db.into(db.collections).insert(collection2);
       await db.into(db.collections).insert(collection3);

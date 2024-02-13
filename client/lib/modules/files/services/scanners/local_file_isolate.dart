@@ -3,15 +3,16 @@ import 'dart:io' as io;
 import 'dart:isolate';
 import 'dart:math';
 
+import 'package:client/app_logger.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/file.dart';
 import 'package:client/models/tables/folder.dart';
+import 'package:client/modules/files/files_constants.dart';
+import 'package:client/modules/files/services/repositories/file_system_repository.dart';
 import 'package:client/repositories/database_repository.dart';
 import 'package:flutter/services.dart';
-import 'package:client/app_logger.dart';
-import 'package:client/modules/files/files_constants.dart';
-import 'package:client/modules/files/services/file_system_repository.dart';
 
+@Deprecated("todo: delete")
 class LocalFileIsolate {
   String dbPath;
   RootIsolateToken? token;
@@ -310,7 +311,6 @@ class LocalFileIsolate {
 
   _initDatabase(String dbPath) {}
 }
-
 
 /** TODO map extra types and move to helper class
     {

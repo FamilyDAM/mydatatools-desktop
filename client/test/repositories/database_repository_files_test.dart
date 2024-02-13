@@ -28,12 +28,12 @@ void main() {
       });
 
       path = await getTemporaryDirectory();
-      databaseRepository = DatabaseRepository(); //dbName
+      databaseRepository = DatabaseRepository.instance; //dbName
       print(databaseRepository);
     });
 
     tearDownAll(() async {
-      databaseRepository.database!.close();
+      (await databaseRepository.database).close();
 
       if (path != null) {
         io.File f = io.File("data/$dbName");
@@ -48,9 +48,9 @@ void main() {
     });
 
     //Apps, AppUsers, Collections, Emails, Files, Folders
-    test('check Collections tables exists', () {
+    test('check Collections tables exists', () async {
       print("closing database");
-      var tables = databaseRepository.database!.allTables;
+      var tables = (await databaseRepository.database).allTables;
 
       var t = tables.firstWhereOrNull((e) {
         return e is m.Files;
@@ -70,7 +70,7 @@ void main() {
           contentType: "image/jpeg",
           size: 101,
           isDeleted: false);
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.files).insert(file);
 
       List<m.File> allItems = await db.select(db.files).get();
@@ -95,7 +95,7 @@ void main() {
           size: 101,
           isDeleted: false);
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.files).insert(file);
 
       List<m.File> allItems = await db.select(db.files).get();
@@ -150,7 +150,7 @@ void main() {
           size: 101,
           isDeleted: false);
 
-      var db = databaseRepository.database!;
+      var db = await databaseRepository.database;
       await db.into(db.files).insert(file1);
       await db.into(db.files).insert(file2);
       await db.into(db.files).insert(file3);

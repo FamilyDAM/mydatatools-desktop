@@ -62,8 +62,8 @@ class _RxFilesPage extends State<RxFilesPage> {
 
     _selectedCollectionSub = RxFilesPage.selectedCollection.listen((value) {
       if (value != null && collection != value) {
-        //create new sub for emails in this collection
-        _filesAndFoldersService = GetFileAndFoldersService();
+        //create new sub for objects in this collection
+        _filesAndFoldersService = GetFileAndFoldersService.instance;
         //close old subscription
         if (_fileServiceSub != null) _fileServiceSub?.cancel();
         //listen for changes while visible
@@ -73,7 +73,7 @@ class _RxFilesPage extends State<RxFilesPage> {
           });
         });
 
-        _filesAndFoldersService!.invoke(GetFileServiceCommand(value, value.path));
+        _filesAndFoldersService!.invoke(GetFileAndFoldersServiceCommand(value, value.path));
       }
       setState(() {
         collection = value;
@@ -172,7 +172,8 @@ class _RxFilesPage extends State<RxFilesPage> {
                               if (n.asset.path != collection?.path) {
                                 //make sure path changed before triggering reload
                                 path = n.asset.path;
-                                _filesAndFoldersService!.invoke(GetFileServiceCommand(collection!, n.asset.path));
+                                _filesAndFoldersService!
+                                    .invoke(GetFileAndFoldersServiceCommand(collection!, n.asset.path));
                                 return true;
                               }
                             }
@@ -215,14 +216,14 @@ class _RxFilesPage extends State<RxFilesPage> {
               //return null, to unselect a collection and have app go back to pick collection (home) page
               //return dummy FileCollection
               path = collection.path;
-              _filesAndFoldersService!.invoke(GetFileServiceCommand(collection, path));
+              _filesAndFoldersService!.invoke(GetFileAndFoldersServiceCommand(collection, path));
             }),
         BreadCrumbItem(
             content: Text(collection.name),
             onTap: () {
               //go back to root of collection
               path = collection.path;
-              _filesAndFoldersService!.invoke(GetFileServiceCommand(collection, path));
+              _filesAndFoldersService!.invoke(GetFileAndFoldersServiceCommand(collection, path));
             }),
         ...parts.where((e) => e != '').map((e) {
           workingPath.add(e);
@@ -232,7 +233,7 @@ class _RxFilesPage extends State<RxFilesPage> {
               onTap: () {
                 //drill into sub folder path
                 path = p;
-                _filesAndFoldersService!.invoke(GetFileServiceCommand(collection, path));
+                _filesAndFoldersService!.invoke(GetFileAndFoldersServiceCommand(collection, path));
               });
         })
       ],

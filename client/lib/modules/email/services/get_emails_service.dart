@@ -1,37 +1,21 @@
 import 'package:client/app_logger.dart';
-import 'package:client/main.dart';
 import 'package:client/models/tables/collection.dart';
 import 'package:client/models/tables/email.dart';
 import 'package:client/modules/email/services/email_repository.dart';
-import 'package:client/repositories/database_repository.dart';
 import 'package:client/services/rx_service.dart';
 
-class EmailService extends RxService<EmailServiceCommand, List<Email>> {
+class GetEmailsService extends RxService<EmailServiceCommand, List<Email>> {
+  static final GetEmailsService _singleton = GetEmailsService();
+  static get instance => _singleton;
   final AppLogger logger = AppLogger(null);
-  EmailRepository? emailRepository;
-
-  static final EmailService _instance = EmailService();
-  static get instance => _instance;
-
-  AppDatabase? database;
-
-  EmailService() {
-    MainApp.appDatabase.listen((value) {
-      database = value;
-    });
-  }
 
   @override
   Future<List<Email>> invoke(EmailServiceCommand command) async {
-    if (database == null) return Future(() => []);
-
     isLoading.add(true);
-    emailRepository = EmailRepository();
-
     //first check for newest emails
 
     //load files and folders from db
-    List<Email> emails = await emailRepository!.emails(command.collection.id, command.sortColumn, command.sortAsc);
+    List<Email> emails = await EmailRepository().emails(command.collection.id, command.sortColumn, command.sortAsc);
     sink.add(emails);
     isLoading.add(false);
     return Future(() => emails);
